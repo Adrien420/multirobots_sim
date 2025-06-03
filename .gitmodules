@@ -9,3 +9,7 @@
 	path = multirobots_ws/src/px4_msgs
 	url = https://github.com/Adrien420/px4_msgs.git
 	branch = main
+[submodule "multirobots_ws/src/robotnik_sensors"]
+	path = multirobots_ws/src/robotnik_sensors
+	url = https://github.com/Adrien420/robotnik_sensors.git
+	branch = ros-devel
