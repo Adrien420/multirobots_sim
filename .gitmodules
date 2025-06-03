@@ -2,3 +2,6 @@
 	path = multirobots_ws/src/gz_ros2_control
 	url = https://github.com/Adrien420/gz_ros2_control.git
 	branch = humble
+[submodule "multirobots_ws/src/Micro-XRCE-DDS-Agent"]
+	path = multirobots_ws/src/Micro-XRCE-DDS-Agent
+	url = https://github.com/Adrien420/Micro-XRCE-DDS-Agent.git
