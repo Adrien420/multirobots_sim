@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="terrain">
+    
+    <xacro:property name="terrain_mesh_path" value="package://gazebo_sim/urdf/meshes/terrain3.dae"/>
+    <xacro:property name="meshBlock">
+        <mesh filename="${terrain_mesh_path}" scale="8 8 1"/>
+    </xacro:property>
+    
+    <link name="world"/>
+    
+    <link name="terrain_link">
+        <visual>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <xacro:insert_block name="meshBlock"/>
+            </geometry>
+            <material name="blue">
+                <color rgba="0 0 0.8 1"/>
+            </material>
+        </visual>    
+
+        <collision>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <geometry>
+                <xacro:insert_block name="meshBlock"/>
+            </geometry>
+        </collision>
+
+        <inertial>
+            <mass value="1.0"/>
+            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <inertia
+                ixx="0.1" ixy="0.0" ixz="0.0"
+                iyy="0.1" iyz="0.0"
+                izz="0.1"/>
+        </inertial>
+    </link>
+
+    <joint name="terrain_joint" type="fixed">
+        <parent link="world"/>
+        <child link="terrain_link"/>
+        <origin xyz="0 0 0" rpy="0 0 0"/>
+    </joint>
+
+    <gazebo>
+        <static>true</static>
+    </gazebo>
+
+</robot>
