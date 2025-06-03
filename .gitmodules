@@ -1,0 +1,4 @@
+[submodule "multirobots_ws/src/gz_ros2_control"]
+	path = multirobots_ws/src/gz_ros2_control
+	url = https://github.com/Adrien420/gz_ros2_control.git
+	branch = humble
