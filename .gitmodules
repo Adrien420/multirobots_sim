@@ -5,3 +5,7 @@
 [submodule "multirobots_ws/src/Micro-XRCE-DDS-Agent"]
 	path = multirobots_ws/src/Micro-XRCE-DDS-Agent
 	url = https://github.com/Adrien420/Micro-XRCE-DDS-Agent.git
+[submodule "multirobots_ws/src/px4_msgs"]
+	path = multirobots_ws/src/px4_msgs
+	url = https://github.com/Adrien420/px4_msgs.git
+	branch = main
