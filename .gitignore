@@ -3,3 +3,5 @@ multirobots_ws/install
 multirobots_ws/log
 multirobots_ws/src/Mirco-XRCE-DDS-Agent/build
 multirobots_ws/src/PX4-Autopilot/build
+.bash_history
+.cache
