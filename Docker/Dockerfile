@@ -5,7 +5,7 @@ ARG USERNAME=multirobots
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
-# Workaround pour la clé GPG expirée
+# Workaround for the expired GPG key
 RUN rm /etc/apt/sources.list.d/ros2-latest.list \
   && rm /usr/share/keyrings/ros2-latest-archive-keyring.gpg
 
@@ -48,7 +48,7 @@ WORKDIR /home/$USERNAME
 
 # PX4 dependencies
 RUN apt-get update && \
-    git clone --recursive https://github.com/PX4/PX4-Autopilot.git && \
+    git clone --recursive https://github.com/Adrien420/PX4-Autopilot.git && \
     cd PX4-Autopilot && \
     bash Tools/setup/ubuntu.sh && \
     cd .. && rm -rf PX4-Autopilot

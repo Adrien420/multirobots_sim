@@ -10,4 +10,8 @@ docker run -it --rm --user="multirobots" --env="DISPLAY" \
 --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
 --net host \
 -v $HOME/multirobots_sim/multirobots_ws:/home/multirobots/multirobots_ws \
+-v $HOME/multirobots_sim/.git:/home/multirobots/.git \
+-v $HOME/multirobots_sim/.gitmodules:/home/multirobots/.gitmodules \
+-v $HOME/multirobots_sim/.gitattributes:/home/multirobots/.gitattributes \
+-v $HOME/multirobots_sim/.gitignore:/home/multirobots/.gitignore \
 cristal-container 
