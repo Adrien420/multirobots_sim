@@ -38,6 +38,19 @@ def generate_launch_description():
         shell=True
     )
     
+    
+    gz_bridge = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        name='gz_bridge',
+        arguments=[
+            '/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
+            '/chatter@std_msgs/msg/String]gz.msgs.StringMsg'
+        ],
+        #parameters=[os.path.join(get_package_share_directory("gazebo_sim"), "config", "ros_gz_bridge.yaml")],
+        output='screen'
+    )
+        
     diff_drive_spawner = Node(
         package="controller_manager",
         executable="spawner",
@@ -83,13 +96,14 @@ def generate_launch_description():
         SetEnvironmentVariable("GZ_SIM_RESOURCE_PATH", resource_path),
         SetEnvironmentVariable("GZ_SIM_SERVER_CONFIG_PATH", server_config_path),
         SetEnvironmentVariable("GZ_SIM_SYSTEM_PLUGIN_PATH", plugins_path),
+        gz_bridge,
         diff_drive_spawner,
         joint_broad_spawner
     ])
     
     ld.add_action(gazebo)
-    ld.add_action(microXRCEagent_cmd)
-    ld.add_action(QGroundControl_cmd)
-    ld.add_action(px4_spawner_cmd)
+    #ld.add_action(microXRCEagent_cmd)
+    #ld.add_action(QGroundControl_cmd)
+    #ld.add_action(px4_spawner_cmd)
     ld.add_action(summit_spawner_cmd)
     return ld
