@@ -33,35 +33,9 @@ def generate_launch_description():
                 'worlds',
                 'forest.sdf '
             ]),
-            '-r', # Permet de lancer directement la simulation
+            '-r', # Allow to start the simulation as soon as Gazebo is launched
         ],
         shell=True
-    )
-    
-    
-    gz_bridge = Node(
-        package='ros_gz_bridge',
-        executable='parameter_bridge',
-        name='gz_bridge',
-        arguments=[
-            '/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
-            '/world/forest/model/summit_xl/link/summit_xl_base_footprint/sensor/summit_xl_front_laser_sensor/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
-            '--ros-args', '--log-level', 'debug'
-        ],
-        #parameters=[os.path.join(get_package_share_directory("gazebo_sim"), "config", "ros_gz_bridge.yaml")],
-        output='screen'
-    )
-        
-    diff_drive_spawner = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=["robotnik_base_controller"],
-    )
-
-    joint_broad_spawner = Node(
-        package="controller_manager",
-        executable="spawner",
-        arguments=["joint_state_broadcaster"],
     )
     
     microXRCEagent_cmd = ExecuteProcess(
@@ -89,7 +63,7 @@ def generate_launch_description():
     
     summit_spawner_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(get_package_share_directory('gazebo_sim'), 'launch', 'spawn_summit.launch.py')
+            os.path.join(get_package_share_directory('gazebo_sim'), 'launch', 'multiple_spawn_summit.launch.py')
         )
     )
 
@@ -97,9 +71,6 @@ def generate_launch_description():
         SetEnvironmentVariable("GZ_SIM_RESOURCE_PATH", resource_path),
         SetEnvironmentVariable("GZ_SIM_SERVER_CONFIG_PATH", server_config_path),
         SetEnvironmentVariable("GZ_SIM_SYSTEM_PLUGIN_PATH", plugins_path),
-        gz_bridge,
-        diff_drive_spawner,
-        joint_broad_spawner
     ])
     
     ld.add_action(gazebo)

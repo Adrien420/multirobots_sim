@@ -2,7 +2,7 @@
 <robot xmlns:xacro="http://wiki.ros.org/xacro">
 
 	<!-- ros2 control plugin -->
-	<xacro:macro name="ros_control">
+	<xacro:macro name="ros_control" params="robot_namespace">
 		<ros2_control name="GazeboSimSystem" type="system">
 			<hardware>
 				<plugin>gz_ros2_control/GazeboSimSystem</plugin>
@@ -47,6 +47,8 @@
 
 		<gazebo>
 			<plugin filename="libgz_ros2_control-system.so" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+				<!-- <robot_param>${robot_namespace}/robot_description</robot_param>
+				<robot_param_node>${robot_namespace}/robot_state_publisher</robot_param_node> -->
 				<robot_param>robot_description</robot_param>
 				<robot_param_node>robot_state_publisher</robot_param_node>
 				<parameters>/home/multirobots/multirobots_ws/install/summit_xl_description/share/summit_xl_description/config/summit_control.yaml</parameters>

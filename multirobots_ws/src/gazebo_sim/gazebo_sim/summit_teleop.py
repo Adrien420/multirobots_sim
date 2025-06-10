@@ -2,7 +2,7 @@ import rclpy
 from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
 from geometry_msgs.msg import TwistStamped
-from sensor_msgs.msg import PointCloud2
+from sensor_msgs.msg import LaserScan
 
 import sys
 import select
@@ -38,13 +38,13 @@ class SummitTeleop(Node) :
             depth=1
         )
         
-        qos = QoSProfile(
-            reliability=ReliabilityPolicy.RELIABLE,
-            durability=DurabilityPolicy.VOLATILE,
-            history=HistoryPolicy.KEEP_LAST,
-            depth=10
-        )
-        self.sub = self.create_subscription(PointCloud2, '/world/forest/model/summit_xl/link/summit_xl_base_footprint/sensor/summit_xl_front_laser_sensor/scan', self.callback, qos)
+        # qos = QoSProfile(
+        #     reliability=ReliabilityPolicy.RELIABLE,
+        #     durability=DurabilityPolicy.VOLATILE,
+        #     history=HistoryPolicy.KEEP_LAST,
+        #     depth=10
+        # )
+        # self.sub = self.create_subscription(LaserScan, '/world/forest/model/summit_xl/link/summit_xl_base_footprint/sensor/summit_xl_front_laser_sensor/scan', self.callback, qos)
 
         # Create publishers
         self.cmd_vel_pub = self.create_publisher(
@@ -58,8 +58,8 @@ class SummitTeleop(Node) :
         # Create a timer to publish control commands
         self.timer = self.create_timer(0.1, self.timer_callback)
         
-    def callback(self, msg):
-        self.get_logger().info(f"Received PointCloud2 message with width: {msg.width}")
+    # def callback(self, msg):
+    #     self.get_logger().info(f"Received PointCloud2 message with width: {msg.intensities}")
     
     def get_key(self):
         tty.setraw(sys.stdin.fileno())

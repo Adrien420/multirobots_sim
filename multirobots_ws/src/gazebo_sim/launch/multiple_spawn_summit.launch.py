@@ -7,30 +7,30 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 
 def launch_setup(context):
-    nb_drones = int(LaunchConfiguration('nb_drones').perform(context))
+    nb_summits = int(LaunchConfiguration('nb_summits').perform(context))
 
-    spawn_drones_cmds = []
+    spawn_summits_cmds = []
 
-    for i in range(1, nb_drones+1):
-        spawn_drones_cmds.append(
+    for i in range(1, nb_summits+1):
+        spawn_summits_cmds.append(
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
-                    os.path.join(get_package_share_directory('gazebo_sim'), 'launch', 'spawn_px4.launch.py')
+                    os.path.join(get_package_share_directory('gazebo_sim'), 'launch', 'spawn_summit.launch.py')
                 ),
                 launch_arguments={
-                    'drone_id':str(i),
+                    'summit_id':str(i),
                     'x_pose':str(i-1)
                 }.items()
             )
         )
         
-    return spawn_drones_cmds
+    return spawn_summits_cmds
 
 def generate_launch_description():
     
     ld = LaunchDescription([
-        DeclareLaunchArgument('nb_drones', default_value='2'),
-        OpaqueFunction(function=launch_setup)
+        DeclareLaunchArgument('nb_summits', default_value='1'),
+        OpaqueFunction(function=launch_setup),
     ])
 
     return ld
