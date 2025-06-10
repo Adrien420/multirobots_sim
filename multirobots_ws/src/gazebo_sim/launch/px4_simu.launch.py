@@ -45,7 +45,8 @@ def generate_launch_description():
         name='gz_bridge',
         arguments=[
             '/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
-            '/chatter@std_msgs/msg/String]gz.msgs.StringMsg'
+            '/world/forest/model/summit_xl/link/summit_xl_base_footprint/sensor/summit_xl_front_laser_sensor/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
+            '--ros-args', '--log-level', 'debug'
         ],
         #parameters=[os.path.join(get_package_share_directory("gazebo_sim"), "config", "ros_gz_bridge.yaml")],
         output='screen'
