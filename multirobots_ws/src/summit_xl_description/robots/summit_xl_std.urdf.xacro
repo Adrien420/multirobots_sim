@@ -37,7 +37,7 @@
 	<xacro:arg name="gps_latitude" default="0"/>
 	<xacro:arg name="gps_longitude" default="0"/>
 
-	<xacro:arg name="robot_namespace" default=""/>
+	<xacro:arg name="robot_namespace" default="summit_xl_1"/>
 
 
     <xacro:macro name="summit_xl" params="prefix publish_bf hq">

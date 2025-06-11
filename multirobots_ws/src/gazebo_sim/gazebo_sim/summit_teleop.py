@@ -29,6 +29,8 @@ class SummitTeleop(Node) :
         
         # Parameters
         self.declare_parameter('summit_id', 1)
+        
+        prefix = '/summit_xl_' + str(self.get_parameter('summit_id').value)
 
         # Configure QoS profile for publishing and subscribing
         qos_profile = QoSProfile(
@@ -48,7 +50,7 @@ class SummitTeleop(Node) :
 
         # Create publishers
         self.cmd_vel_pub = self.create_publisher(
-            TwistStamped, '/robotnik_base_controller/cmd_vel', qos_profile)
+            TwistStamped, prefix + '/robotnik_base_controller/cmd_vel', qos_profile)
 
         # Initialize variables
         self.settings = termios.tcgetattr(sys.stdin)

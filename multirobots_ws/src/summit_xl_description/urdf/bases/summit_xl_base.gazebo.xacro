@@ -47,13 +47,16 @@
 
 		<gazebo>
 			<plugin filename="libgz_ros2_control-system.so" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
-				<!-- <robot_param>${robot_namespace}/robot_description</robot_param>
-				<robot_param_node>${robot_namespace}/robot_state_publisher</robot_param_node> -->
 				<robot_param>robot_description</robot_param>
 				<robot_param_node>robot_state_publisher</robot_param_node>
-				<parameters>/home/multirobots/multirobots_ws/install/summit_xl_description/share/summit_xl_description/config/summit_control.yaml</parameters>
+				<parameters>/tmp/${robot_namespace}_control.yaml</parameters>
+				<!-- <controller_manager_name>controller_manager</controller_manager_name> -->
+				<ros>
+					<namespace>${robot_namespace}</namespace>
+				</ros>
 			</plugin>
 		</gazebo>
+
 	</xacro:macro>
 
 	<gazebo reference="base_footprint">

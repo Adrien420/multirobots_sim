@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import os, yaml
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, OpaqueFunction
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution, Command
@@ -7,6 +8,27 @@ from launch_ros.substitutions import FindPackageShare
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 
+def generate_yaml_with_namespace(context, summit_id):
+    namespace = f"summit_xl_{summit_id}"
+    original_yaml_path = os.path.join(
+        FindPackageShare("summit_xl_description").perform(context),
+        "config",
+        "summit_control.yaml"
+    )
+    namespaced_yaml_path = f"/tmp/{namespace}_control.yaml"
+
+    with open(original_yaml_path, 'r') as f:
+        yaml_data = yaml.safe_load(f)
+
+    namespaced_yaml = {}
+    for key, value in yaml_data.items():
+        namespaced_key = f"{namespace}/{key}"
+        namespaced_yaml[namespaced_key] = value
+
+    with open(namespaced_yaml_path, 'w') as f:
+        yaml.dump(namespaced_yaml, f)
+
+    return namespaced_yaml_path
 
 def launch_setup(context):
 
@@ -17,8 +39,11 @@ def launch_setup(context):
     
     spawn_summits_cmds = []
     
-    #namespace = f'summit_xl_{summit_id}'
-    namespace = ""
+    namespace = f'summit_xl_{summit_id}'
+    
+    yaml_namespace_path = generate_yaml_with_namespace(context, summit_id)
+    
+    print(yaml_namespace_path)
     
      # Path to the xacro file
     xacro_file = PathJoinSubstitution([
@@ -28,8 +53,8 @@ def launch_setup(context):
     ])
 
     # Robot's description (URDF generated from the .xacro thanks to the command xacro)
-    #robot_description_config = ParameterValue(Command(['xacro', ' ', xacro_file, ' robot_namespace:=', namespace]), value_type=str)
-    robot_description_config = ParameterValue(Command(['xacro', ' ', xacro_file]), value_type=str)
+    robot_description_config = ParameterValue(Command(['xacro', ' ', xacro_file, ' robot_namespace:=', namespace]), value_type=str)
+    #robot_description_config = ParameterValue(Command(['xacro', ' ', xacro_file]), value_type=str)
 
     #robot_state_publisher_node
     spawn_summits_cmds.append(
@@ -51,8 +76,7 @@ def launch_setup(context):
             arguments=[
                 'clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
                 'world/forest/model/summit_xl/link/summit_xl_base_footprint/sensor/summit_xl_front_laser_sensor/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
-                #'--ros-args', '-p', 'expand_gz_topic_names:=true', '-r', f'__ns:=/summit_xl_{summit_id}',
-                '--ros-args',
+                '--ros-args', '-p', 'expand_gz_topic_names:=true', '-r', f'__ns:=/summit_xl_{summit_id}',
                 '--log-level', 'info'
             ],
             # parameters=[os.path.join(get_package_share_directory("gazebo_sim"), "config", "ros_gz_bridge.yaml")], Doesn't work
@@ -71,7 +95,8 @@ def launch_setup(context):
                 '-topic', 'robot_description',
                 '-x', x,
                 '-y', y,
-                '-z', z
+                '-z', z,
+                '--ros-args', '--log-level', 'info'
             ],
             output='screen'
         )
