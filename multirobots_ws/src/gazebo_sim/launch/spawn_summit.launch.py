@@ -2,11 +2,12 @@
 
 import os, yaml
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, OpaqueFunction
+from launch.actions import DeclareLaunchArgument, OpaqueFunction, RegisterEventHandler
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution, Command
 from launch_ros.substitutions import FindPackageShare
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
+from launch.event_handlers import OnProcessExit
 
 def generate_yaml_with_namespace(context, summit_id):
     namespace = f"summit_xl_{summit_id}"
@@ -56,71 +57,64 @@ def launch_setup(context):
     robot_description_config = ParameterValue(Command(['xacro', ' ', xacro_file, ' robot_namespace:=', namespace]), value_type=str)
     #robot_description_config = ParameterValue(Command(['xacro', ' ', xacro_file]), value_type=str)
 
-    #robot_state_publisher_node
-    spawn_summits_cmds.append(
-        Node(
-            package="robot_state_publisher",
-            executable="robot_state_publisher",
-            namespace=namespace,
-            output="screen",
-            parameters=[{"robot_description": robot_description_config}]
-        )
+    robot_state_publisher_node = Node(
+        package="robot_state_publisher",
+        executable="robot_state_publisher",
+        namespace=namespace,
+        output="screen",
+        parameters=[{"robot_description": robot_description_config, "use_sim_time": True}]
     )
     
-    #gz_bridge
-    spawn_summits_cmds.append(
-        Node(
-            package='ros_gz_bridge',
-            executable='parameter_bridge',
-            name='gz_bridge',
-            arguments=[
-                'clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
-                'world/forest/model/summit_xl/link/summit_xl_base_footprint/sensor/summit_xl_front_laser_sensor/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
-                '--ros-args', '-p', 'expand_gz_topic_names:=true', '-r', f'__ns:=/summit_xl_{summit_id}',
-                '--log-level', 'info'
-            ],
-            # parameters=[os.path.join(get_package_share_directory("gazebo_sim"), "config", "ros_gz_bridge.yaml")], Doesn't work
-            output='screen'
-        )
+    gz_bridge = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        name='gz_bridge',
+        arguments=[
+            'clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
+            f'world/forest/model/summit_xl_{summit_id}/link/summit_xl_base_footprint/sensor/summit_xl_front_laser_sensor/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
+            '--ros-args', '-p', 'expand_gz_topic_names:=true', '-r', f'__ns:=/summit_xl_{summit_id}',
+            '--log-level', 'info'
+        ],
+        parameters=[{"use_sim_time": True}],
+        output='screen'
     )
     
-    #spawn_summit
-    spawn_summits_cmds.append(
-        Node(
-            package="ros_gz_sim",
-            executable="create",
-            namespace=namespace,
-            arguments=[
-                '-name', f'{namespace}',
-                '-topic', 'robot_description',
-                '-x', x,
-                '-y', y,
-                '-z', z,
-                '--ros-args', '--log-level', 'info'
-            ],
-            output='screen'
-        )
+    spawn_summit = Node(
+        package="ros_gz_sim",
+        executable="create",
+        namespace=namespace,
+        arguments=[
+            '-name', f'{namespace}',
+            '-topic', 'robot_description',
+            '-x', x,
+            '-y', y,
+            '-z', z,
+            '--ros-args', '--log-level', 'info'
+        ],
+        output='screen'
     )
     
-    #diff_drive_spawner
-    spawn_summits_cmds.append(
-        Node(
-            package="controller_manager",
-            executable="spawner",
-            namespace=namespace,
-            arguments=["robotnik_base_controller"],
-        )
+    robotnik_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        namespace=namespace,
+        arguments=["robotnik_base_controller"],
+        parameters=[{"use_sim_time": True}],
     )
 
-    #joint_broad_spawner
-    spawn_summits_cmds.append(
-        Node(
-            package="controller_manager",
-            executable="spawner",
-            namespace=namespace,
-            arguments=["joint_state_broadcaster"],
-        )
+    joint_broadcaster_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        namespace=namespace,
+        arguments=["joint_state_broadcaster"],
+        parameters=[{"use_sim_time": True}],
     )
+    
+    spawn_summits_cmds.append(robot_state_publisher_node)
+    spawn_summits_cmds.append(gz_bridge)
+    spawn_summits_cmds.append(spawn_summit)
+    spawn_summits_cmds.append(robotnik_controller_spawner)
+    spawn_summits_cmds.append(joint_broadcaster_spawner)
     
     return spawn_summits_cmds
 

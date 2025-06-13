@@ -30,7 +30,7 @@ class SummitTeleop(Node) :
         # Parameters
         self.declare_parameter('summit_id', 1)
         
-        prefix = '/summit_xl_' + str(self.get_parameter('summit_id').value)
+        self.summit_name = '/summit_xl_' + str(self.get_parameter('summit_id').value)
 
         # Configure QoS profile for publishing and subscribing
         qos_profile = QoSProfile(
@@ -40,17 +40,17 @@ class SummitTeleop(Node) :
             depth=1
         )
         
-        # qos = QoSProfile(
-        #     reliability=ReliabilityPolicy.RELIABLE,
-        #     durability=DurabilityPolicy.VOLATILE,
-        #     history=HistoryPolicy.KEEP_LAST,
-        #     depth=10
-        # )
-        # self.sub = self.create_subscription(LaserScan, '/world/forest/model/summit_xl/link/summit_xl_base_footprint/sensor/summit_xl_front_laser_sensor/scan', self.callback, qos)
+        qos = QoSProfile(
+            reliability=ReliabilityPolicy.RELIABLE,
+            durability=DurabilityPolicy.VOLATILE,
+            history=HistoryPolicy.KEEP_LAST,
+            depth=10
+        )
+        self.sub = self.create_subscription(LaserScan, self.summit_name + '/world/forest/model' + self.summit_name + '/link/summit_xl_base_footprint/sensor/summit_xl_front_laser_sensor/scan', self.lidar_callback, qos)
 
         # Create publishers
         self.cmd_vel_pub = self.create_publisher(
-            TwistStamped, prefix + '/robotnik_base_controller/cmd_vel', qos_profile)
+            TwistStamped, self.summit_name + '/robotnik_base_controller/cmd_vel', qos_profile)
 
         # Initialize variables
         self.settings = termios.tcgetattr(sys.stdin)
@@ -60,8 +60,9 @@ class SummitTeleop(Node) :
         # Create a timer to publish control commands
         self.timer = self.create_timer(0.1, self.timer_callback)
         
-    # def callback(self, msg):
-    #     self.get_logger().info(f"Received PointCloud2 message with width: {msg.intensities}")
+    def lidar_callback(self, msg):
+        if msg.ranges[0] < 2:
+            self.get_logger().info(f"Received LaserScan message from {self.summit_name} : {msg.ranges[0]}")
     
     def get_key(self):
         tty.setraw(sys.stdin.fileno())

@@ -1,8 +1,9 @@
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, ExecuteProcess, SetEnvironmentVariable
+from launch.actions import IncludeLaunchDescription, ExecuteProcess, SetEnvironmentVariable, DeclareLaunchArgument
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import PathJoinSubstitution
+from launch.substitutions import PathJoinSubstitution, LaunchConfiguration
 from launch_ros.substitutions import FindPackageShare
+from launch.conditions import IfCondition
 from launch_ros.actions import Node
 
 import os
@@ -10,6 +11,9 @@ from ament_index_python import get_package_share_directory, get_package_prefix
 # Attention : get_package_share_directory renvoit le chemin /.../share/pkg_name et non /.../share
 
 def generate_launch_description():
+    
+    # Launch arguments
+    use_rviz = LaunchConfiguration('rviz')
     
     # Paths
     PX4__model_path = "/home/multirobots/multirobots_ws/src/PX4-Autopilot/Tools/simulation/gz/models"
@@ -31,11 +35,20 @@ def generate_launch_description():
             PathJoinSubstitution([
                 FindPackageShare('gazebo_sim'),
                 'worlds',
-                'forest.sdf '
+                'forest2.sdf '
             ]),
             '-r', # Allow to start the simulation as soon as Gazebo is launched
         ],
         shell=True
+    )
+    
+    rviz = Node(
+        package='rviz2',
+        executable='rviz2',
+        output='screen',
+        arguments=['-d', os.path.join(get_package_share_directory('gazebo_sim'), 'rviz', 'summit_xl_1.rviz')],
+        parameters=[{"use_sim_time": True}],
+        condition=IfCondition(use_rviz)
     )
     
     microXRCEagent_cmd = ExecuteProcess(
@@ -71,9 +84,11 @@ def generate_launch_description():
         SetEnvironmentVariable("GZ_SIM_RESOURCE_PATH", resource_path),
         SetEnvironmentVariable("GZ_SIM_SERVER_CONFIG_PATH", server_config_path),
         SetEnvironmentVariable("GZ_SIM_SYSTEM_PLUGIN_PATH", plugins_path),
+        DeclareLaunchArgument('rviz', default_value='false')
     ])
     
     ld.add_action(gazebo)
+    ld.add_action(rviz)
     #ld.add_action(microXRCEagent_cmd)
     #ld.add_action(QGroundControl_cmd)
     #ld.add_action(px4_spawner_cmd)
