@@ -54,7 +54,7 @@ def launch_setup(context):
     ])
 
     # Robot's description (URDF generated from the .xacro thanks to the command xacro)
-    robot_description_config = ParameterValue(Command(['xacro', ' ', xacro_file, ' robot_namespace:=', namespace]), value_type=str)
+    robot_description_config = ParameterValue(Command(['xacro', ' ', xacro_file, ' id:=', f'{summit_id}']), value_type=str)
     #robot_description_config = ParameterValue(Command(['xacro', ' ', xacro_file]), value_type=str)
 
     robot_state_publisher_node = Node(
@@ -62,7 +62,7 @@ def launch_setup(context):
         executable="robot_state_publisher",
         namespace=namespace,
         output="screen",
-        parameters=[{"robot_description": robot_description_config, "use_sim_time": True}]
+        parameters=[{"robot_description": robot_description_config, "use_sim_time": True, "frame_prefix": f'{namespace}/'}]
     )
     
     gz_bridge = Node(
@@ -71,7 +71,7 @@ def launch_setup(context):
         name='gz_bridge',
         arguments=[
             'clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
-            f'world/forest/model/summit_xl_{summit_id}/link/summit_xl_base_footprint/sensor/summit_xl_front_laser_sensor/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
+            f'scan_{summit_id}@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
             '--ros-args', '-p', 'expand_gz_topic_names:=true', '-r', f'__ns:=/summit_xl_{summit_id}',
             '--log-level', 'info'
         ],

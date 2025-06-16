@@ -37,7 +37,7 @@
 	<xacro:arg name="gps_latitude" default="0"/>
 	<xacro:arg name="gps_longitude" default="0"/>
 
-	<xacro:arg name="robot_namespace" default="summit_xl_1"/>
+	<xacro:arg name="id" default="1"/>
 
 
     <xacro:macro name="summit_xl" params="prefix publish_bf hq">
@@ -106,14 +106,14 @@
 			<origin xyz="-0.22 0 0.275" rpy="0 0 0"/>
 		</xacro:sensor_gps_with_mast-->
 		<!-- 2d laser -->
-		<xacro:sensor_lidar_m10_p prefix="$(arg prefix)front_laser" parent="$(arg prefix)base_link" prefix_topic="front_laser" gpu="$(arg gpu)">
+		<xacro:sensor_lidar_m10_p id="$(arg id)" prefix="$(arg prefix)" prefix_laser="$(arg prefix)front_laser" parent="$(arg prefix)base_link">
 			<origin xyz="0.0 0.0 0.2726" rpy="0 0 0"/>
 		</xacro:sensor_lidar_m10_p>
 
    </xacro:macro>
 
    <!-- Gazebo ros control pluggins -->
-   <xacro:ros_control robot_namespace="$(arg robot_namespace)"/>
+   <xacro:ros_control id="$(arg id)" prefix="$(arg prefix)"/>
 
 	<xacro:if value="$(arg ros_planar_move_plugin)">
 
