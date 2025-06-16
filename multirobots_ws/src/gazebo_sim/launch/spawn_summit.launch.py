@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 
 import os, yaml
-from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, OpaqueFunction, RegisterEventHandler
+from launch.launch_description import LaunchDescription
+from launch.actions import DeclareLaunchArgument, OpaqueFunction, TimerAction, RegisterEventHandler
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution, Command
 from launch_ros.substitutions import FindPackageShare
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
-from launch.event_handlers import OnProcessExit
+from launch.event_handlers import OnProcessStart
 
 def generate_yaml_with_namespace(context, summit_id):
     namespace = f"summit_xl_{summit_id}"
@@ -57,12 +57,17 @@ def launch_setup(context):
     robot_description_config = ParameterValue(Command(['xacro', ' ', xacro_file, ' id:=', f'{summit_id}']), value_type=str)
     #robot_description_config = ParameterValue(Command(['xacro', ' ', xacro_file]), value_type=str)
 
-    robot_state_publisher_node = Node(
-        package="robot_state_publisher",
-        executable="robot_state_publisher",
-        namespace=namespace,
-        output="screen",
-        parameters=[{"robot_description": robot_description_config, "use_sim_time": True, "frame_prefix": f'{namespace}/'}]
+    robot_state_publisher_node = TimerAction(
+        period=5.0,
+        actions=[
+            Node(
+                package="robot_state_publisher",
+                executable="robot_state_publisher",
+                namespace=namespace,
+                output="screen",
+                parameters=[{"robot_description": robot_description_config, "use_sim_time": True, "frame_prefix": f'{namespace}/'}]
+            )
+        ]
     )
     
     gz_bridge = Node(
@@ -100,8 +105,9 @@ def launch_setup(context):
         namespace=namespace,
         arguments=["robotnik_base_controller"],
         parameters=[{"use_sim_time": True}],
-    )
-
+    )   
+       
+    
     joint_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner",
@@ -109,7 +115,7 @@ def launch_setup(context):
         arguments=["joint_state_broadcaster"],
         parameters=[{"use_sim_time": True}],
     )
-    
+                
     spawn_summits_cmds.append(robot_state_publisher_node)
     spawn_summits_cmds.append(gz_bridge)
     spawn_summits_cmds.append(spawn_summit)
