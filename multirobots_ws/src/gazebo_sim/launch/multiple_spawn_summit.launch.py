@@ -29,7 +29,7 @@ def launch_setup(context):
 def generate_launch_description():
     
     ld = LaunchDescription([
-        DeclareLaunchArgument('nb_summits', default_value='2'),
+        DeclareLaunchArgument('nb_summits', default_value='1'),
         OpaqueFunction(function=launch_setup),
     ])
 
