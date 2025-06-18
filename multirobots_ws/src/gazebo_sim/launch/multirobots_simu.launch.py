@@ -51,6 +51,18 @@ def generate_launch_description():
         condition=IfCondition(use_rviz)
     )
     
+    gz_bridge = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        name='gz_bridge',
+        arguments=[
+            'clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
+            '--ros-args', '--log-level', 'info'
+        ],
+        parameters=[{"use_sim_time": True}],
+        output='screen'
+    )
+    
     microXRCEagent_cmd = ExecuteProcess(
         cmd=[
             'MicroXRCEAgent udp4 -p 8888'
@@ -89,6 +101,7 @@ def generate_launch_description():
     
     ld.add_action(gazebo)
     ld.add_action(rviz)
+    ld.add_action(gz_bridge)
     #ld.add_action(microXRCEagent_cmd)
     #ld.add_action(QGroundControl_cmd)
     #ld.add_action(px4_spawner_cmd)

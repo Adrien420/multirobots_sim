@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 
-import os, yaml
+import os, yaml, datetime
 from launch.launch_description import LaunchDescription
-from launch.actions import DeclareLaunchArgument, OpaqueFunction, TimerAction, RegisterEventHandler
+from launch.actions import DeclareLaunchArgument, OpaqueFunction, TimerAction, ExecuteProcess
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution, Command
 from launch_ros.substitutions import FindPackageShare
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
-from launch.event_handlers import OnProcessStart
 
 def generate_yaml_with_namespace(context, summit_id):
     namespace = f"summit_xl_{summit_id}"
@@ -42,9 +41,10 @@ def launch_setup(context):
     
     namespace = f'summit_xl_{summit_id}'
     
-    yaml_namespace_path = generate_yaml_with_namespace(context, summit_id)
+    generate_yaml_with_namespace(context, summit_id)
     
-    print(yaml_namespace_path)
+    now = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    rosbag_save_dir = f'/home/multirobots/multirobots_ws/src/gazebo_sim/rosbag/summit_xl_{summit_id}_{now}'
     
      # Path to the xacro file
     xacro_file = PathJoinSubstitution([
@@ -75,12 +75,23 @@ def launch_setup(context):
         executable='parameter_bridge',
         name='gz_bridge',
         arguments=[
-            'clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
+            #'clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
             f'scan_{summit_id}@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
+            f'imu_data_{summit_id}@sensor_msgs/msg/Imu[gz.msgs.IMU',
             '--ros-args', '-p', 'expand_gz_topic_names:=true', '-r', f'__ns:=/summit_xl_{summit_id}',
             '--log-level', 'info'
         ],
         parameters=[{"use_sim_time": True}],
+        output='screen'
+    )
+    
+    rosbag = ExecuteProcess(
+        cmd=[
+            'ros2', 'bag', 'record',
+            '-o', rosbag_save_dir,
+            f'summit_xl_{summit_id}/scan_{summit_id}',
+            '--use-sim-time'
+        ],
         output='screen'
     )
     
@@ -118,6 +129,7 @@ def launch_setup(context):
                 
     spawn_summits_cmds.append(robot_state_publisher_node)
     spawn_summits_cmds.append(gz_bridge)
+    #spawn_summits_cmds.append(rosbag)
     spawn_summits_cmds.append(spawn_summit)
     spawn_summits_cmds.append(robotnik_controller_spawner)
     spawn_summits_cmds.append(joint_broadcaster_spawner)

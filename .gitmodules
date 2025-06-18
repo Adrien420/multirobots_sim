@@ -12,7 +12,7 @@
 [submodule "multirobots_ws/src/robotnik_sensors"]
 	path = multirobots_ws/src/robotnik_sensors
 	url = https://github.com/Adrien420/robotnik_sensors.git
-	branch = ros-devel
+	branch = humble-devel
 [submodule "multirobots_ws/src/PX4-Autopilot"]
 	path = multirobots_ws/src/PX4-Autopilot
 	url = https://github.com/Adrien420/PX4-Autopilot.git
