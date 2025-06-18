@@ -40,9 +40,6 @@ git switch dev-sensors # Tmp
 # switch on branches defined by .gitmodules
 git submodule foreach -q --recursive 'git switch $(git config -f $toplevel/.gitmodules submodule.$name.branch || echo master)' 
 
-# checkout to tags defined by .gitmodules
-git submodule foreach -q --recursive 'git checkout tags/$(git config -f $toplevel/.gitmodules submodule.$name.tag || echo master)' 
-
 # Init PX4-Autopilot package's submodules
 cd multirobots_ws/src/PX4-Autopilot
 git submodule update --init --recursive 
