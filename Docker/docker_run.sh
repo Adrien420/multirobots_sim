@@ -17,4 +17,5 @@ docker run -it --rm --user="multirobots" --env="DISPLAY" \
 -v $HOME/multirobots_sim/.gitmodules:/home/multirobots/.gitmodules \
 -v $HOME/multirobots_sim/.gitattributes:/home/multirobots/.gitattributes \
 -v $HOME/multirobots_sim/.gitignore:/home/multirobots/.gitignore \
+-v $HOME/multirobots_sim/README.md:/home/multirobots/README.md \
 cristal-container 
