@@ -8,7 +8,7 @@ xhost +local:multirobots # Nécessaire pour permettre l'utilisation d'interfaces
 
 # Lancement d'un conteneur docker, basé sur l\'image cristal-container
 # -v utiliser pour monter des dossiers du host, pour pouvoir utiliser et modifier leur contenu dans le conteneur
-docker run -it --rm --user="multirobots" --env="DISPLAY" \
+docker run --security-opt seccomp=unconfined -it --rm --user="multirobots" --env="DISPLAY" \
 --env="QT_X11_NO_MITSHM=1" \
 --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
 --net host \
