@@ -6,8 +6,8 @@ Panels:
       Expanded:
         - /Global Options1
         - /Status1
-        - /LaserScan1
-        - /RobotModel1
+        - /TF1/Frames1
+        - /TF1/Tree1
       Splitter Ratio: 0.5
     Tree Height: 555
   - Class: rviz_common/Selection
@@ -27,7 +27,7 @@ Panels:
     Experimental: false
     Name: Time
     SyncMode: 0
-    SyncSource: ""
+    SyncSource: LaserScan
 Visualization Manager:
   Class: ""
   Displays:
@@ -59,27 +59,27 @@ Visualization Manager:
       Channel Name: intensity
       Class: rviz_default_plugins/LaserScan
       Color: 255; 255; 255
-      Color Transformer: ""
+      Color Transformer: Intensity
       Decay Time: 0
       Enabled: true
       Invert Rainbow: false
       Max Color: 255; 255; 255
-      Max Intensity: 4096
+      Max Intensity: -999999
       Min Color: 0; 0; 0
-      Min Intensity: 0
+      Min Intensity: 999999
       Name: LaserScan
-      Position Transformer: ""
+      Position Transformer: XYZ
       Selectable: true
       Size (Pixels): 3
-      Size (m): 0.009999999776482582
-      Style: Flat Squares
+      Size (m): 0.10000000149011612
+      Style: Points
       Topic:
         Depth: 5
         Durability Policy: Volatile
         Filter size: 10
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /summit_xl_1/world/forest/model/summit_xl_1/link/summit_xl_base_footprint/sensor/summit_xl_front_laser_sensor/scan
+        Value: /summit_xl_1/scan_1
       Use Fixed Frame: true
       Use rainbow: true
       Value: true
@@ -144,18 +144,83 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        summit_xl_imu_base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        summit_xl_imu_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
       Mass Properties:
         Inertia: false
         Mass: false
       Name: RobotModel
-      TF Prefix: ""
+      TF Prefix: summit_xl_1
       Update Interval: 0
       Value: true
       Visual Enabled: true
+    - Class: rviz_default_plugins/TF
+      Enabled: true
+      Frame Timeout: 15
+      Frames:
+        All Enabled: false
+        summit_xl_1/summit_xl_back_left_wheel:
+          Value: false
+        summit_xl_1/summit_xl_back_right_wheel:
+          Value: false
+        summit_xl_1/summit_xl_base_docking_contact_link:
+          Value: false
+        summit_xl_1/summit_xl_base_footprint:
+          Value: false
+        summit_xl_1/summit_xl_base_link:
+          Value: false
+        summit_xl_1/summit_xl_front_laser_base_link:
+          Value: false
+        summit_xl_1/summit_xl_front_laser_link:
+          Value: true
+        summit_xl_1/summit_xl_front_left_wheel:
+          Value: false
+        summit_xl_1/summit_xl_front_right_wheel:
+          Value: false
+        summit_xl_1/summit_xl_imu_base_link:
+          Value: true
+        summit_xl_1/summit_xl_imu_link:
+          Value: true
+        summit_xl_1/summit_xl_odom:
+          Value: true
+      Marker Scale: 1
+      Name: TF
+      Show Arrows: true
+      Show Axes: true
+      Show Names: false
+      Tree:
+        summit_xl_1/summit_xl_odom:
+          summit_xl_1/summit_xl_base_footprint:
+            summit_xl_1/summit_xl_base_link:
+              summit_xl_1/summit_xl_back_left_wheel:
+                {}
+              summit_xl_1/summit_xl_back_right_wheel:
+                {}
+              summit_xl_1/summit_xl_base_docking_contact_link:
+                {}
+              summit_xl_1/summit_xl_front_laser_base_link:
+                summit_xl_1/summit_xl_front_laser_link:
+                  {}
+              summit_xl_1/summit_xl_front_left_wheel:
+                {}
+              summit_xl_1/summit_xl_front_right_wheel:
+                {}
+              summit_xl_1/summit_xl_imu_base_link:
+                summit_xl_1/summit_xl_imu_link:
+                  {}
+      Update Interval: 0
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
-    Fixed Frame: summit_xl_base_footprint
+    Fixed Frame: summit_xl_1/summit_xl_odom
     Frame Rate: 30
   Name: root
   Tools:
@@ -198,25 +263,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz_default_plugins/Orbit
-      Distance: 3.4432098865509033
+      Distance: 27.947763442993164
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
+        X: 1.1564679145812988
+        Y: -1.9626139402389526
+        Z: -3.7226622104644775
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 0.785398006439209
+      Pitch: 1.1097966432571411
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 0.7803980112075806
+      Yaw: 2.963560104370117
     Saved: ~
 Window Geometry:
   Displays:
@@ -234,5 +299,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1200
-  X: 280
-  Y: 177
+  X: 129
+  Y: 197
