@@ -194,3 +194,6 @@ Semaine 9 :
 - Sur le PC de CRSItAL, erreur lors de l'installation d'un module python à cause du certificat de l'univ -> mais a marché en relançant juste, sans rien changer (et avait déjà marché avant) / Problème avec le ~/.bashrc ou autre, mais le source du install/setup.bash n'a pas été pris en compte : besoin de le faire manuellement (première fois seulement apparemment)
 - Save la config dans rviz ne marche que sur un même PC, car cela le fait avec le fichier de config présent dans install/ et non src/
 - Pour le problème avec terminator sur la machine de CRIStAL : problème lié au porfile seccomp de docker (cf https://github.com/mviereck/x11docker/issues/346) => fonctionne si on le désactive avec l'option --security-opt seccomp=unconfined dans la commande docker run
+- Switch complet sur l'ordinateur de CRIStAL (un peu plus performant, et bien plus d'espace de stockage)
+- Maintenant que paramètres de friction bien pris en compte (dont mu2) => baisser mu2 (qui était à 1) règle le problème des rotations bloquées => par contre le robot glisse pas mal, ce qui entraîne une dérivation importante (sur le terrain présentant un léger relief -> fonctionne très bien sur le ground_plane)
+- Comme rviz permet juste de visualiser et non de simuler, les mouvements du summit ne sont pas synchros entre rviz et gazebo, car friction pas prise en compte dans rviz
