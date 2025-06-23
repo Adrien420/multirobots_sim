@@ -1,6 +1,7 @@
 - Gz sensors (urdf/sdf) :
 
 https://medium.com/@alitekes1/gazebo-sim-plugin-and-sensors-for-acquire-data-from-simulation-environment-681d8e2ad853
+https://ibrahimmansur4.medium.com/migrating-from-gazebo-classic-to-gazebo-sim-a-practical-guide-804af2011011
 https://github.com/gazebosim/gz-sim/blob/gz-sim8/examples/worlds/sensors.sdf
 https://github.com/gazebosim/gz-sensors?tab=readme-ov-file
 

@@ -85,22 +85,11 @@
 				<origin xyz="-${wheel_offset_x} -${wheel_offset_y} ${wheel_offset_z}" rpy="0 0 0"/>
 			</xacro:omni_wheel>
 		</xacro:if>
-        <!-- IMU >
-		<xacro:sensor_imu prefix="$(arg prefix)imu" parent="$(arg prefix)base_link" topic="imu/data_raw">
-			<origin xyz="-0.18 0.0 0.170" rpy="0 0 0"/>
-		</xacro:sensor_imu-->
-		<!-- ptz camera >
-		<xacro:sensor_axis prefix="$(arg prefix)front_ptz_camera" parent="$(arg prefix)base_link">
-			<origin xyz="0.185 0 0.1967" rpy="0 ${15*PI/180} 0"/>
-		</xacro:sensor_axis-->
+
 	  <!-- RGBD >
 	  <xacro:sensor_orbbec_astra prefix="$(arg prefix)front_rgbd_camera" parent="$(arg prefix)base_link" prefix_topic="front_rgbd_camera">
 			<origin xyz="0.324 0.012 0.172" rpy="0 0 0"/>
 		</xacro:sensor_orbbec_astra-->
-	  <!-- GPS >
-	  <xacro:sensor_gps_with_mast prefix="$(arg prefix)gps" parent="$(arg prefix)base_link" gps_latitude="$(arg gps_latitude)" gps_longitude="$(arg gps_longitude)">
-			<origin xyz="-0.22 0 0.275" rpy="0 0 0"/>
-		</xacro:sensor_gps_with_mast-->
 		<!-- IMU -->
 		<xacro:sensor_pixhawk id="$(arg id)" frame_prefix="$(arg prefix)imu_" name_prefix="$(arg prefix)" parent="$(arg prefix)base_link">
 			<origin xyz="-0.18 0.0 0.170" rpy="0 0 0"/>
@@ -109,6 +98,14 @@
 		<xacro:sensor_hokuyo_urg04lx id="$(arg id)" frame_prefix="$(arg prefix)front_laser_" name_prefix="$(arg prefix)" parent="$(arg prefix)base_link">
 			<origin xyz="0.0 0.0 0.2726" rpy="0 0 0"/>
 		</xacro:sensor_hokuyo_urg04lx>
+		<!-- GPS -->
+	  	<xacro:sensor_gps id="$(arg id)" frame_prefix="$(arg prefix)gps_" name_prefix="$(arg prefix)" parent="$(arg prefix)base_link">
+			<origin xyz="-0.22 0 0.275" rpy="0 0 0"/>
+		</xacro:sensor_gps>
+		<!-- ptz camera -->
+		<xacro:sensor_axis_m5013 id="$(arg id)" frame_prefix="$(arg prefix)camera_" name_prefix="$(arg prefix)" parent="$(arg prefix)base_link">
+			<origin xyz="0.185 0 0.1967" rpy="0 ${15*PI/180} 0"/>
+		</xacro:sensor_axis_m5013>
 
    </xacro:macro>
 

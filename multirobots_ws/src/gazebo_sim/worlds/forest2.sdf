@@ -21,6 +21,9 @@
       filename="gz-sim-imu-system"
       name="gz::sim::systems::Imu">
     </plugin>
+    <plugin 
+      filename="gz-sim-navsat-system" 
+      name="gz::sim::systems::NavSat"/>
     <plugin
       filename="gz-sim-scene-broadcaster-system"
       name="gz::sim::systems::SceneBroadcaster">

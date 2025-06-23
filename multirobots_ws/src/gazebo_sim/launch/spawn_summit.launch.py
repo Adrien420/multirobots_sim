@@ -78,7 +78,11 @@ def launch_setup(context):
             #'clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
             f'scan_{summit_id}@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
             f'imu_data_{summit_id}@sensor_msgs/msg/Imu[gz.msgs.IMU',
+            f'navsat_data_{summit_id}@gps_msgs/msg/GPSFix[gz.msgs.NavSat',
+            f'color/image_raw_{summit_id}@sensor_msgs/msg/Image[gz.msgs.Image',
+            f'color/camera_info_{summit_id}@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
             '--ros-args', '-p', 'expand_gz_topic_names:=true', '-r', f'__ns:=/summit_xl_{summit_id}',
+            '--remap', f'/summit_xl_{summit_id}/color/camera_info_{summit_id}:=/summit_xl_{summit_id}/color/camera_info',
             '--log-level', 'info'
         ],
         parameters=[{"use_sim_time": True}],
