@@ -130,13 +130,24 @@ def launch_setup(context):
         arguments=["joint_state_broadcaster"],
         parameters=[{"use_sim_time": True}],
     )
+
+    ptz_camera_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        namespace=namespace,
+        arguments=["ptz_camera_controller"],
+        parameters=[{"use_sim_time": True}],
+    )
                 
     spawn_summits_cmds.append(robot_state_publisher_node)
     spawn_summits_cmds.append(gz_bridge)
     #spawn_summits_cmds.append(rosbag)
     spawn_summits_cmds.append(spawn_summit)
+
+    # Controllers
     spawn_summits_cmds.append(robotnik_controller_spawner)
     spawn_summits_cmds.append(joint_broadcaster_spawner)
+    spawn_summits_cmds.append(ptz_camera_controller_spawner)
     
     return spawn_summits_cmds
 

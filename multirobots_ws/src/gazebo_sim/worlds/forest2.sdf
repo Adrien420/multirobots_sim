@@ -8,7 +8,7 @@
       <real_time_factor>1</real_time_factor>
       <real_time_update_rate>1000</real_time_update_rate>
     </physics>
-    <plugin
+    <!-- <plugin  # Déjà inclus dans le fichier de config "/home/multirobots/multirobots_ws/src/PX4-Autopilot/Tools/simulation/gz/server.config", inclus dans GZ_SIM_SERVER_CONFIG_PATH
       filename="gz-sim-physics-system"
       name="gz::sim::systems::Physics">
     </plugin>
@@ -31,7 +31,7 @@
     <plugin
       filename="gz-sim-user-commands-system"
       name="gz::sim::systems::UserCommands">
-    </plugin>
+    </plugin> -->
     <scene>
       <ambient>0.400000006 0.400000006 0.400000006 1</ambient>
       <background>0.699999988 0.699999988 0.699999988 1</background>

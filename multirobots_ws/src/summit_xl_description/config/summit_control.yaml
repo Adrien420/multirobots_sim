@@ -8,6 +8,9 @@ controller_manager:
     robotnik_base_controller:
       type: diff_drive_controller/DiffDriveController
 
+    ptz_camera_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+
 robotnik_base_controller:
   ros__parameters:
     left_wheel_names:
@@ -50,3 +53,17 @@ robotnik_base_controller:
         max_velocity: 6.0
         has_acceleration_limits: true
         max_acceleration: 6.0
+
+ptz_camera_controller:
+  ros__parameters:
+    joints:
+      - summit_xl_camera_pan_joint
+      - summit_xl_camera_tilt_joint
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+      - velocity
+    gains:
+      summit_xl_camera_pan_joint: {p: 100.0, i: 0.01, d: 10.0}
+      summit_xl_camera_tilt_joint: {p: 100.0, i: 0.01, d: 10.0}

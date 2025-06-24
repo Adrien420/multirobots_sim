@@ -102,8 +102,8 @@ def generate_launch_description():
     ld.add_action(gazebo)
     ld.add_action(rviz)
     ld.add_action(gz_bridge)
-    #ld.add_action(microXRCEagent_cmd)
-    #ld.add_action(QGroundControl_cmd)
-    #ld.add_action(px4_spawner_cmd)
+    ld.add_action(microXRCEagent_cmd)
+    ld.add_action(QGroundControl_cmd)
+    ld.add_action(px4_spawner_cmd)
     ld.add_action(summit_spawner_cmd)
     return ld

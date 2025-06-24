@@ -3,5 +3,6 @@ multirobots_ws/install
 multirobots_ws/log
 multirobots_ws/src/Mirco-XRCE-DDS-Agent/build
 multirobots_ws/src/PX4-Autopilot/build
+multirobots_ws/src/QGroundControl.AppImage/squashfs-root
 .bash_history
 .cache
