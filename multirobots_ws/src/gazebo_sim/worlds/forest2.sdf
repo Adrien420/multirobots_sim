@@ -277,6 +277,16 @@
         <pose>0 0 0.070000000000000007 0 0 0</pose>
         <scale>1 1 1</scale>
         <link name='terrain_link'>
+          <pose>100 100 0.070000000000000007 0 0 0</pose>
+          <velocity>0 0 0 0 0 0</velocity>
+          <acceleration>0 0 0 0 0 0</acceleration>
+          <wrench>0 0 0 0 0 0</wrench>
+        </link>
+      </model>
+      <model name='terrain2'>
+        <pose>0 0 0.070000000000000007 0 0 0</pose>
+        <scale>1 1 1</scale>
+        <link name='terrain2_link'>
           <pose>0 0 0.070000000000000007 0 0 0</pose>
           <velocity>0 0 0 0 0 0</velocity>
           <acceleration>0 0 0 0 0 0</acceleration>
@@ -405,6 +415,69 @@
             <mesh>
               <scale>8 8 1</scale>
               <uri>model://gazebo_sim/urdf/meshes/terrain3.dae</uri>
+            </mesh>
+          </geometry>
+        </visual>
+        <self_collide>false</self_collide>
+        <enable_wind>false</enable_wind>
+        <kinematic>false</kinematic>
+      </link>
+      <static>true</static>
+      <pose>100 100 0.070000000000000007 0 0 0</pose>
+      <self_collide>false</self_collide>
+    </model>
+    <model name='terrain2'>
+      <joint name='terrain2_joint' type='fixed'>
+        <pose>0 0 0 0 0 0</pose>
+        <parent>world</parent>
+        <child>terrain2_link</child>
+      </joint>
+      <link name='terrain2_link'>
+        <pose>0 0 0 0 0 0</pose>
+        <inertial>
+          <pose>0 0 0 0 0 0</pose>
+          <mass>1</mass>
+          <inertia>
+            <ixx>0.10000000000000001</ixx>
+            <ixy>0</ixy>
+            <ixz>0</ixz>
+            <iyy>0.10000000000000001</iyy>
+            <iyz>0</iyz>
+            <izz>0.10000000000000001</izz>
+          </inertia>
+        </inertial>
+        <collision name='terrain2_link_collision'>
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>8 8 1</scale>
+              <uri>model://gazebo_sim/urdf/meshes/big_forest.dae</uri>
+            </mesh>
+          </geometry>
+          <max_contacts>10</max_contacts>
+          <surface>
+            <contact>
+              <ode/>
+            </contact>
+            <bounce/>
+            <friction>
+              <ode>
+                <mu>1</mu>
+                <mu2>1</mu2>
+              </ode>
+              <torsional>
+                <ode/>
+              </torsional>
+              <ode/>
+            </friction>
+          </surface>
+        </collision>
+        <visual name='terrain2_link_visual'>
+          <pose>0 0 0 0 0 0</pose>
+          <geometry>
+            <mesh>
+              <scale>1 1 1</scale>
+              <uri>model://gazebo_sim/urdf/meshes/big_forest.dae</uri>
             </mesh>
           </geometry>
         </visual>

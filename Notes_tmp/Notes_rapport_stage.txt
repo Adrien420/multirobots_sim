@@ -197,7 +197,7 @@ Semaine 9 :
 - Switch complet sur l'ordinateur de CRIStAL (un peu plus performant, et bien plus d'espace de stockage)
 - Maintenant que paramètres de friction bien pris en compte (dont mu2) => baisser mu2 (qui était à 1) règle le problème des rotations bloquées => par contre le robot glisse pas mal, ce qui entraîne une dérivation importante (sur le terrain présentant un léger relief -> fonctionne très bien sur le ground_plane)
 - Comme rviz permet juste de visualiser et non de simuler, les mouvements du summit ne sont pas synchros entre rviz et gazebo, car friction pas prise en compte dans rviz
-
+- Tentative d'utilser un autre modèle pour le terrain trouvé sur internet, plus réaliste => même aves quelques modifications sur blender (suppression des éléments inutiles à la simulation, terrain raccourci et nombre d'arbres générés par )le ParticleSystem diminué, compliqué de bien exporter dans le même état (textures, présence des arbes, échelle) + problèmes de performance
 
 Semaine 10 :
 
@@ -205,3 +205,4 @@ Semaine 10 :
 - Ajout d'une caméra => possède une mobilité = nécessité d'un contrôleur (présent dans le fichier de config du package de robotnik, en ros1) => pour le moment : joint passé en fixe pour tester le capteur
 - Dans rviz : pas de possibilité de changer le topic utilisé pour récupérer les infos de la caméra (${namespace}/color/camera_info par défaut), mais comme nécessité d'utiliser l'id du robot pour le topic gz, pour différencier les topics des différents robots => on se retrouve avec le gz_bridge avec un topic ${namespace}/color/camera_info_${id}
 => le remap du côté de ros ne fonctionne pas (messages plus présents), pareil en le faisant depuis la ligne définissant le bridge => en fait marche avec le remap de ros, juste un problème de syntaxe (après l'ajout du ns : --remap /{ns}/topic:=/{ns}/topic_rename)
+
