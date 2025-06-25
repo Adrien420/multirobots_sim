@@ -12,6 +12,8 @@ docker run --security-opt seccomp=unconfined -it --rm --user="multirobots" --env
 --env="QT_X11_NO_MITSHM=1" \
 --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \
 --net host \
+--device /dev/dri \
+-v /dev/dri:/dev/dri \
 -v $HOME/multirobots_sim/multirobots_ws:/home/multirobots/multirobots_ws \
 -v $HOME/multirobots_sim/.git:/home/multirobots/.git \
 -v $HOME/multirobots_sim/.gitmodules:/home/multirobots/.gitmodules \

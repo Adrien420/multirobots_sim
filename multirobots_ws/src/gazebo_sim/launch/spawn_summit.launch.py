@@ -58,7 +58,7 @@ def launch_setup(context):
     #robot_description_config = ParameterValue(Command(['xacro', ' ', xacro_file]), value_type=str)
 
     robot_state_publisher_node = TimerAction(
-        period=5.0,
+        period=10.0,
         actions=[
             Node(
                 package="robot_state_publisher",

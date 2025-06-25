@@ -213,5 +213,11 @@ Semaine 10 :
 - Soucis de performances : avec 2 summits (avec leurs capteurs et contrôleurs) et 2 drones (avec pas mal de capteurs pas encore implémentés) : la simulation tourne à 7% du temps réel
 - Problème avec QGroundControl impossible à lancer sur la nouvelle machine => exécutable visiblement devenu un simple txt (corrompu ?), vraisemblablement à cause du passage par github => réinstallé (depuis le site officiel de QGounControl => puis chmod +x ./QGroundControl-x86_64.AppImage
 ./QGroundControl-x86_64.AppImage --appimage-extract)
-- Drones PX4 qui ne sont plus armés sur les 2 machines et donc impossible à contrôler => provient d'un conflit entre les plugins des capteurs ajoutés dans le forest2.sdf pour le summit, qui sont les mêmes que ceux inclus dans le fichier de config /home/multirobots/multirobots_ws/src/PX4-Autopilot/Tools/simulation/gz/server.config, inclus dans GZ_SIM_SERVER_CONFIG_PATH dans le launchfile => résolu en enlevant ceux du .sdf
-=> En fait règle le problème pour les PX4, mais plus de données reçues pour les capteurs en question (IMU, NavSat) à cause de ça
+- Drones PX4 qui ne sont plus armés sur les 2 machines et donc impossible à contrôler => provient d'un conflit entre les plugins des capteurs ajoutés dans le forest2.sdf pour le summit, qui sont les mêmes que ceux inclus dans le fichier de config /home/multirobots/multirobots_ws/src/PX4-Autopilot/Tools/simulation/gz/server.config (qui sont ovverides par ceux du world), inclus dans GZ_SIM_SERVER_CONFIG_PATH dans le launchfile => résolu en enlevant ceux du .sdf
+=> En fait règle le problème pour les PX4, mais plus de données reçues pour les capteurs en question (IMU, NavSat) à cause de ça -> en faite si fonctionne comme ça
+- Le gpu n'était pas accessible / utilisé dans docker (rendu fait à 100% par le CPU) => gpu intégré pour des cartes graphiques Intel grâce à l'ajout de "--device /dev/dri \
+-v /dev/dri:/dev/dri \" dans le commande de lancement docker run => passage de 7 à 25 % du temps réel (toujours beaucoup trop lent, mais déjà un peu mieux)
+- Paramètres du monde changés : update rate passé de 1000 à 200 Hz et step size passée de 0.001 à 0.005 ms = Fréquence d’actualisation de la physique dans Gazebo réduite et durée du “pas” de simulation augmentée (chaque calcul physique couvrira une période plus longue)
+=> Permet de fluidifier la simulation (au détriment d'un peu de précision, mais devrait être largement suffisant (à vérifier quand même...)) : 25 -> 50/60% de RTF (Real Time Factor)
+- Le CPU est saturé (gz-server 200% du CPU d'après htop) => en fait = 2 coeurs utilisés à 100%, pas anormal
+- Textures manquantes pour le summit dans gazebo, mais présentes dans rviz => causé par la balise material de l'urdf
