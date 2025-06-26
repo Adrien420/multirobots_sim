@@ -7,6 +7,7 @@ from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import LaunchConfiguration
 
 def launch_setup(context):
+    use_rosbag = LaunchConfiguration('use_rosbag')
     nb_summits = int(LaunchConfiguration('nb_summits').perform(context))
 
     spawn_summits_cmds = []
@@ -18,6 +19,7 @@ def launch_setup(context):
                     os.path.join(get_package_share_directory('gazebo_sim'), 'launch', 'spawn_summit.launch.py')
                 ),
                 launch_arguments={
+                    'use_rosbag':use_rosbag,
                     'summit_id':str(i),
                     'x_pose':str(i-1)
                 }.items()
@@ -29,6 +31,7 @@ def launch_setup(context):
 def generate_launch_description():
     
     ld = LaunchDescription([
+        DeclareLaunchArgument('use_rosbag', default_value='false'),
         DeclareLaunchArgument('nb_summits', default_value='2'),
         OpaqueFunction(function=launch_setup),
     ])

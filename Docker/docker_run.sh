@@ -1,9 +1,11 @@
 #! /bin/bash
 
-sudo cpupower frequency-set -u 2.0GHz # Limitation de la fréquence max des CPUs (pour éviter de faire surchauffer et ventiler mon PC)
-sudo chmod 600 /swapfile
-sudo mkswap /swapfile
-sudo swapon /swapfile
+# You can uncomment some of the commands below if your computer has perfomance issues
+sudo cpupower frequency-set -u 2.0GHz # Limits max frequency of CPUs (to avoid the overheating and noisy ventilation of the computer)
+#sudo chmod 600 /swapfile
+#sudo mkswap /swapfile
+#sudo swapon /swapfile
+
 xhost +local:multirobots # Nécessaire pour permettre l'utilisation d'interfaces graphiques dans le conteneur docker
 
 # Lancement d'un conteneur docker, basé sur l\'image cristal-container

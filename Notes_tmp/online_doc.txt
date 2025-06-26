@@ -12,3 +12,8 @@ https://github.com/gazebosim/gz-sim/issues/2152
 https://robotics.stackexchange.com/questions/30853/rotation-error-in-gazebo-simulation
 https://robotics.stackexchange.com/questions/25211/how-to-set-fdir1-mu1-and-mu2-in-the-gazebo-tag-inside-a-urdf-file
 https://answers.ros.org/question/355364/
+
+(- Nav :
+
+https://docs.nav2.org/setup_guides/sensors/mapping_localization.html
+)

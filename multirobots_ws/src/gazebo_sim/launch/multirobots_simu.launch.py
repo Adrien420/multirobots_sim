@@ -14,6 +14,9 @@ def generate_launch_description():
     
     # Launch arguments
     use_rviz = LaunchConfiguration('rviz')
+    use_rosbag = LaunchConfiguration('rosbag')
+    nb_summits = LaunchConfiguration('nb_summits')
+    nb_drones = LaunchConfiguration('nb_drones')
     
     # Paths
     PX4__model_path = "/home/multirobots/multirobots_ws/src/PX4-Autopilot/Tools/simulation/gz/models"
@@ -83,20 +86,24 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory('gazebo_sim'), 'launch', 'multiple_spawn_px4.launch.py')
         ),
-        launch_arguments={'nb_drones':'2'}.items()
+        launch_arguments={'nb_drones':nb_drones}.items()
     )
     
     summit_spawner_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory('gazebo_sim'), 'launch', 'multiple_spawn_summit.launch.py')
-        )
+        ),
+        launch_arguments={'nb_summits':nb_summits, 'use_rosbag':use_rosbag}.items()
     )
 
     ld = LaunchDescription([
         SetEnvironmentVariable("GZ_SIM_RESOURCE_PATH", resource_path),
         SetEnvironmentVariable("GZ_SIM_SERVER_CONFIG_PATH", server_config_path),
         SetEnvironmentVariable("GZ_SIM_SYSTEM_PLUGIN_PATH", plugins_path),
-        DeclareLaunchArgument('rviz', default_value='false')
+        DeclareLaunchArgument('rviz', default_value='false'),
+        DeclareLaunchArgument('rosbag', default_value='false'),
+        DeclareLaunchArgument('nb_summits', default_value='1'),
+        DeclareLaunchArgument('nb_drones', default_value='1')
     ])
     
     ld.add_action(gazebo)

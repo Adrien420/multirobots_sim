@@ -76,20 +76,12 @@
      </transmission>
 
     <gazebo reference="${prefix}_wheel">
-      <!-- <collision>
-        <surface>
-          <friction>
-            <ode> -->
-              <mu1 value="1.0"/>
-              <mu2 value="0.8"/>
-              <kp value="10000000.0" />
-              <kd value="1.0" />
-              <fdir1 value="1 0 0"/>
-              <turnGravityOff>false</turnGravityOff>
-            <!-- </ode>
-          </friction>
-        </surface>
-      </collision> -->
+      <mu1 value="1.0"/>
+      <mu2 value="0.7"/>
+      <kp value="10000000.0" />
+      <kd value="1.0" />
+      <fdir1 value="1 0 0"/>
+      <turnGravityOff>false</turnGravityOff>
     </gazebo>
 
 

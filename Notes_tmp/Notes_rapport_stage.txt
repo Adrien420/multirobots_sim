@@ -221,3 +221,16 @@ Semaine 10 :
 => Permet de fluidifier la simulation (au détriment d'un peu de précision, mais devrait être largement suffisant (à vérifier quand même...)) : 25 -> 50/60% de RTF (Real Time Factor)
 - Le CPU est saturé (gz-server 200% du CPU d'après htop) => en fait = 2 coeurs utilisés à 100%, pas anormal
 - Textures manquantes pour le summit dans gazebo, mais présentes dans rviz => causé par la balise material de l'urdf
+- Lidar 2d facilement ajouté pour le px4 à partir du modèle prévu spécifiquement pour ce capteur (joint et include copiés collés dans le modèle de base pour le moment) => Par contre : je ne sais pas où se trouve la balise sensor qui en définit les spécificités -> en fait chaque capteur a son dossier avec le .sdf le définissant + RTF passé à 30-40% (d'abord 20-30, avant que le PC soit redémarré : peut-être autres applis (mozzila & brave))
+- Problème de collision => les pattes des drones rentrent dans le sol, même si ils spawnent bien au-dessus -> sûrement causé par RTF/update rate trop bas ou setp size trop haut => pb réglé en repassant step size à 0.001 (mais RTF -> 20%)
+=> Limite trouvée à 0.003 ms pour le step size (RTF -> ~30%), tout en évitant les problèmes de collision pour les drones
+- Pour la visualisation des données des différents robots dans rviz : l'idée serait de modifier dynamiquement le fichier de config .rviz au launch, pour visualiser les données d'un robot choisi (rviz pas adapté pour afficher un nombre variable de robots en même temps)
+- PX4 : pas de tf tree publié, et fichiers en .sdf et non .urdf (pas moyen de juste publier l'urdf du drone comme robot_description juste comme ça) : compliqué à implémenter dans rviz comme ça
+=> package sdformat_urdf trouvé, qui permet d'utiliser le format .sdf pour les robot_description -> Mais pas viable à cause de certaines limitations du package (pas possible d'utiliser des <sensor>)
+=> package sdf2urdf testé mais pas concluant : sûrement dû aux mêmes limitations
+- Commande du script permettant la limitation de la fq des CPUs mise en commentaire : RTF passé de 30% à 35-40% (ni le CPU ni la RAM ne sont saturés -> peut-être plus un problème avec l'interface graphique / utilisation du gpu)
+=> Le Render/3D:0 (observé avec sudo intel_gpu_top, installé via sudo apt install intel-gpu-tools) est à 85-99% ce qui est élevé et certainement le facteur limitant
+=> RTF à ~90% avec seulement 2 summits, et à ~50% avec seuelement 2 drones => En passant la résolution de la caméra du donr de 1280x960 à 640x480 => RTF à ~70% pour seulement 2 drones
+-> GPU pas assez puissant pour des caméras de haute résolution à priori / pour plusieurs robots => à partir de 3 robots simulés : GPU saturé -> RTF ~40%
+- Correctifs pour pouvoir utiliser tous les arguments du launchfile (rviz / nb_summits / nb_drones / rosbag)
+- Ajout d'un nouveau launchfile pour pouvoir rejouer les données enregistrées avec "ros2 bag record" (uniquement dans rviz, en enregistrant les topics tf, tf_static, robot_description (mais celui-ci n'est à priori pas nécessaire) et ceux des capteurs (pour le moment juste le scan du lidar))

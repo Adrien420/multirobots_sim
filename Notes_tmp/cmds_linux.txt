@@ -124,9 +124,14 @@ git checkout tags/<tag> (ex: git checkout tags/v2.4.2)
 
 git remote -v
 
+- Changer l'url d'une remote :
+
+git remote set-url <remote> <url> (ex : git remote set-url origin https://github.com/user/repo.git)
+
 - Lier la branche locale avec la branche distante :
 
 git push --set-upstream origin master
+
 
 - Vérifier que la branche locale est bien liée avec la branche distante :
 
