@@ -7,6 +7,7 @@ from launch.substitutions import LaunchConfiguration, PathJoinSubstitution, Comm
 from launch_ros.substitutions import FindPackageShare
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
+from launch.conditions import IfCondition
 
 def generate_yaml_with_namespace(context, summit_id):
     namespace = f"summit_xl_{summit_id}"
@@ -35,6 +36,8 @@ def launch_setup(context):
     x = LaunchConfiguration('x_pose')
     y = LaunchConfiguration('y_pose')
     z = LaunchConfiguration('z_pose')
+
+    use_rosbag = LaunchConfiguration('use_rosbag')
     summit_id = int(LaunchConfiguration('summit_id').perform(context))
     
     spawn_summits_cmds = []
@@ -58,7 +61,7 @@ def launch_setup(context):
     #robot_description_config = ParameterValue(Command(['xacro', ' ', xacro_file]), value_type=str)
 
     robot_state_publisher_node = TimerAction(
-        period=10.0,
+        period=15.0,
         actions=[
             Node(
                 package="robot_state_publisher",
@@ -94,8 +97,11 @@ def launch_setup(context):
             'ros2', 'bag', 'record',
             '-o', rosbag_save_dir,
             f'summit_xl_{summit_id}/scan_{summit_id}',
+            f'summit_xl_{summit_id}/robot_description',
+            'tf', 'tf_static',
             '--use-sim-time'
         ],
+        condition=IfCondition(use_rosbag),
         output='screen'
     )
     
@@ -121,7 +127,6 @@ def launch_setup(context):
         arguments=["robotnik_base_controller"],
         parameters=[{"use_sim_time": True}],
     )   
-       
     
     joint_broadcaster_spawner = Node(
         package="controller_manager",
@@ -141,7 +146,7 @@ def launch_setup(context):
                 
     spawn_summits_cmds.append(robot_state_publisher_node)
     spawn_summits_cmds.append(gz_bridge)
-    #spawn_summits_cmds.append(rosbag)
+    spawn_summits_cmds.append(rosbag)
     spawn_summits_cmds.append(spawn_summit)
 
     # Controllers
@@ -157,6 +162,7 @@ def generate_launch_description():
         DeclareLaunchArgument('x_pose', default_value='0.0'),
         DeclareLaunchArgument('y_pose', default_value='1.0'),
         DeclareLaunchArgument('z_pose', default_value='1.0'),
+        DeclareLaunchArgument('use_rosbag', default_value='false'),
         DeclareLaunchArgument('summit_id', default_value='1'),
         OpaqueFunction(function=launch_setup)
     ])
