@@ -230,7 +230,13 @@ Semaine 10 :
 => package sdf2urdf testé mais pas concluant : sûrement dû aux mêmes limitations
 - Commande du script permettant la limitation de la fq des CPUs mise en commentaire : RTF passé de 30% à 35-40% (ni le CPU ni la RAM ne sont saturés -> peut-être plus un problème avec l'interface graphique / utilisation du gpu)
 => Le Render/3D:0 (observé avec sudo intel_gpu_top, installé via sudo apt install intel-gpu-tools) est à 85-99% ce qui est élevé et certainement le facteur limitant
-=> RTF à ~90% avec seulement 2 summits, et à ~50% avec seuelement 2 drones => En passant la résolution de la caméra du donr de 1280x960 à 640x480 => RTF à ~70% pour seulement 2 drones
+=> RTF à ~90% avec seulement 2 summits, et à ~50% avec seuelement 2 drones => En passant la résolution de la caméra du drone de 1280x960 à 640x480 => RTF à ~70% pour seulement 2 drones
 -> GPU pas assez puissant pour des caméras de haute résolution à priori / pour plusieurs robots => à partir de 3 robots simulés : GPU saturé -> RTF ~40%
 - Correctifs pour pouvoir utiliser tous les arguments du launchfile (rviz / nb_summits / nb_drones / rosbag)
 - Ajout d'un nouveau launchfile pour pouvoir rejouer les données enregistrées avec "ros2 bag record" (uniquement dans rviz, en enregistrant les topics tf, tf_static, robot_description (mais celui-ci n'est à priori pas nécessaire) et ceux des capteurs (pour le moment juste le scan du lidar))
+- Finalement, pour la publication des tf du px4, puisque c'est l'unique objectif, les limitations du package sdformat_urdf (qui permet d'utiliser un .sdf comme robot_description) sont acceptables
+- Les géométries de type plane font partie des limites => remplacés par des box de mêmes dimensions, avec une fine épaisseur + ajout d'une rotation dans le pose du visual pour que la texture reste dans la bonne direction
+- Pour pouvoir trouver les mesh, puisque model:// ne marche pas pour rviz (propre à gazebo) : création de fonctions pour modifier tous les model:// dans les model.sdf imbriqués (drone de base + capteurs), à l'aide de patternes (regex)
+=> Puis test avec le chemin absolu, mais n'a pas fonctionné -> impossible pour rviz d'ouvrir les fichiers de cette façon 
+=> Donc utilisation de package://pkg/..., ce qui a nécessité au préalable de modifier le CMakeLists.txt de PX4-Autopilots pour ajouter le dossier contenant les modèles dans install/... (par ailleurs, chose qui a porté à confusion, le nom du projet est px4 et non PX4-Autopilot, qui est donc bien un package ros)
+- Création d'un node pour publier un tf_static entre la frame world et la frame de base du summit et du px4, pour pouvoir utiliser cette frame world comme fixed_frame dans rviz, et ainsi visualiser différents robots en même temps

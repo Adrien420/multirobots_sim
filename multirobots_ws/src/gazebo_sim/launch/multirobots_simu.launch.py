@@ -65,6 +65,13 @@ def generate_launch_description():
         parameters=[{"use_sim_time": True}],
         output='screen'
     )
+
+    static_tf_publisher = Node(
+        package='gazebo_sim',
+        executable='static_tf_publisher',
+        output='screen',
+        parameters=[{"use_sim_time": True}],
+    )
     
     microXRCEagent_cmd = ExecuteProcess(
         cmd=[
@@ -106,11 +113,18 @@ def generate_launch_description():
         DeclareLaunchArgument('nb_drones', default_value='1')
     ])
     
+    # Simulation
     ld.add_action(gazebo)
     ld.add_action(rviz)
     ld.add_action(gz_bridge)
+    ld.add_action(static_tf_publisher)
+
+    # PX4
     ld.add_action(microXRCEagent_cmd)
     ld.add_action(QGroundControl_cmd)
     ld.add_action(px4_spawner_cmd)
+
+    # Summit
     ld.add_action(summit_spawner_cmd)
+
     return ld

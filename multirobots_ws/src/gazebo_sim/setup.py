@@ -33,7 +33,7 @@ setup(
         'console_scripts': [
             'px4_teleop = gazebo_sim.px4_teleop:main',
             'summit_teleop = gazebo_sim.summit_teleop:main',
-            'fake_scan = gazebo_sim.fake_scan:main'
+            'static_tf_publisher = gazebo_sim.static_tf_publisher:main'
         ],
     },
 )
