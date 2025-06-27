@@ -16,7 +16,7 @@
 
 2 - Créer un backup du dépôt cloné localement (mv PX4-Autopilot PX4-Autopilot_backup par ex)
 
-3 - A la racine du dépôt local, ajouter le submodule avec la commande : git submodule add -b <branch> <url_fork> <submodule_path> (ex : git submodule add -b main git@github.com:Adrien420/PX4-Autopilot.git multirobots_ws/src/PX4-Autopilot)
+3 - A la racine du dépôt local, ajouter le submodule avec la commande : git submodule add -b <branch> <url_fork> <submodule_path> (ex : git submodule add -b main https://github.com/Adrien420/PX4-Autopilot.git multirobots_ws/src/PX4-Autopilot)
 
 4 - Modifier le submodule (à la main, ou avec rsync -a <source> <destination>) => Attention, tout modifier change le remote pour lé dépôt d'origine et non le fork !
 

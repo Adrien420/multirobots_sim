@@ -18,3 +18,7 @@
 	path = multirobots_ws/src/PX4-Autopilot
 	url = https://github.com/Adrien420/PX4-Autopilot.git
 	branch = main
+[submodule "multirobots_ws/src/sdformat_urdf"]
+	path = multirobots_ws/src/sdformat_urdf
+	url = https://github.com/Adrien420/sdformat_urdf.git
+	branch = humble
