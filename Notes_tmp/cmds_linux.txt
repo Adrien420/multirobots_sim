@@ -108,6 +108,11 @@ git restore --staged <file>
 
 git log <remote>/<branch>..HEAD (ex : git log origin/dev-sensors..HEAD)
 
+- Revert un changement de fichier qui a été push :
+
+git checkout HEAD~1 -- /path/to/file
+Puis commit & push
+
 - Vérifier la branche du clone + si à jour :
 
 git status
