@@ -24,6 +24,12 @@ def patch_nested_model(robot_desc:str, model_name:str):
         tmp_model_file = infp.read()
 
     tmp_model_file = re.sub(r'model://([^/<\s]+)(/[^<\s]*)?', replace_model_uri, tmp_model_file)
+    
+    for i in range(4):
+        tmp_model_file = tmp_model_file.replace(
+            f'<joint name="rotor_{i}_joint" type="revolute">',
+            f'<joint name="rotor_{i}_joint" type="fixed">'
+        )
 
     with open('/tmp/' + model_name, 'w') as outfp:
         outfp.write(tmp_model_file)

@@ -133,10 +133,13 @@ git remote -v
 
 git remote set-url <remote> <url> (ex : git remote set-url origin https://github.com/user/repo.git)
 
+- Récupérer les branches du remote :
+
+git fetch <remote> (ex: git fetch origin)
+
 - Lier la branche locale avec la branche distante :
 
 git push --set-upstream origin master
-
 
 - Vérifier que la branche locale est bien liée avec la branche distante :
 
