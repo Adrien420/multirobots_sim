@@ -5,9 +5,8 @@ import re
 
 
 from launch import LaunchDescription
-from launch.actions import ExecuteProcess, DeclareLaunchArgument
-from launch.substitutions import LaunchConfiguration, TextSubstitution, PathJoinSubstitution
-from launch_ros.substitutions import FindPackageShare
+from launch.actions import ExecuteProcess, DeclareLaunchArgument, OpaqueFunction
+from launch.substitutions import LaunchConfiguration, TextSubstitution
 from launch_ros.actions import Node
 
 def replace_model_uri(match):
@@ -41,10 +40,9 @@ def patch_nested_model(robot_desc:str, model_name:str):
 
     return robot_desc
 
-def generate_launch_description():
-    
-    drone_id = LaunchConfiguration('drone_id')
-    x_pose = LaunchConfiguration('x_pose')
+def launch_setup(context):
+    drone_id = int(LaunchConfiguration('drone_id').perform(context))
+    x_pose = int(LaunchConfiguration('x_pose').perform(context))
 
     sdf_file = "/home/multirobots/multirobots_ws/src/PX4-Autopilot/Tools/simulation/gz/models/x500/model.sdf"
 
@@ -63,27 +61,51 @@ def generate_launch_description():
         output="screen",
         parameters=[{"robot_description": robot_desc, "use_sim_time": True}]
     )
+
+    gz_bridge = Node(
+        package='ros_gz_bridge',
+        executable='parameter_bridge',
+        name='gz_bridge',
+        arguments=[
+            #'clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
+            f'world/forest/model/x500_{drone_id}/link/link/sensor/lidar_2d_v2/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
+            '--log-level', 'info'
+        ],
+        parameters=[{"use_sim_time": True}],
+        output='screen'
+    )
+
+    spawn_px4_cmd = ExecuteProcess(
+        cmd=[
+            '/home/multirobots/multirobots_ws/src/PX4-Autopilot/build/px4_sitl_default/bin/px4',
+            '-i', str(drone_id)
+        ],
+        env={
+            'PX4_GZ_STANDALONE': '1',
+            'PX4_SYS_AUTOSTART': '4001',
+            'PX4_SIM_MODEL': 'gz_x500',
+            'PX4_GZ_MODEL_POSE': [
+                str(x_pose),
+                TextSubstitution(text=',0,1,0,0,0')
+            ],
+            'PX4_GZ_WORLD': 'forest',
+            'PATH': os.environ.get('PATH', '') + ':/home/multirobots/multirobots_ws/src/PX4-Autopilot/build/px4_sitl_default/bin',
+        },
+        output='screen',
+    )
+
+    spawn_px4_cmds = []
+
+    spawn_px4_cmds.append(robot_state_publisher_node)
+    #spawn_px4_cmds.append(gz_bridge)
+    spawn_px4_cmds.append(spawn_px4_cmd)
+
+    return spawn_px4_cmds
+
+def generate_launch_description():
     
     return LaunchDescription([
         DeclareLaunchArgument('drone_id', default_value='1'),
         DeclareLaunchArgument('x_pose', default_value='0'),
-        ExecuteProcess(
-            cmd=[
-                '/home/multirobots/multirobots_ws/src/PX4-Autopilot/build/px4_sitl_default/bin/px4',
-                '-i', drone_id
-            ],
-            env={
-                'PX4_GZ_STANDALONE': '1',
-                'PX4_SYS_AUTOSTART': '4001',
-                'PX4_SIM_MODEL': 'gz_x500',
-                'PX4_GZ_MODEL_POSE': [
-                    x_pose,
-                    TextSubstitution(text=',0,1,0,0,0')
-                ],
-                'PX4_GZ_WORLD': 'forest',
-                'PATH': os.environ.get('PATH', '') + ':/home/multirobots/multirobots_ws/src/PX4-Autopilot/build/px4_sitl_default/bin',
-            },
-            output='screen',
-        ),
-        robot_state_publisher_node
-])
+        OpaqueFunction(function=launch_setup)
+    ])
