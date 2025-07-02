@@ -3,10 +3,24 @@
     <gravity>0 0 -9.8000000000000007</gravity>
     <magnetic_field>6.0000000000000002e-06 2.3e-05 -4.1999999999999998e-05</magnetic_field>
     <atmosphere type='adiabatic'/>
-    <physics type='ode'>
+    <physics type='ignored'>
       <max_step_size>0.003</max_step_size>
       <real_time_factor>1</real_time_factor>
       <real_time_update_rate>200</real_time_update_rate>
+      <dart>
+        <collision_detector>bullet</collision_detector>
+        <solver>
+          <solver_type>pgs</solver_type>
+        </solver>
+      </dart>
+      <bullet>
+        <solver>
+          <type>sequential_impulse</type>
+          <iters>100</iters>
+        </solver>
+        <friction_model>cone_friction</friction_model>
+         <contact_surface_layer>0.005</contact_surface_layer>
+      </bullet>
     </physics>
     <!-- Déjà inclus dans le fichier de config "/home/multirobots/multirobots_ws/src/PX4-Autopilot/Tools/simulation/gz/server.config", inclus dans GZ_SIM_SERVER_CONFIG_PATH -->
     <!--plugin
@@ -422,9 +436,17 @@
       <link name='link'>
         <collision name='collision'>
           <geometry>
-            <mesh>
+            <!--mesh>
               <uri>model://gazebo_sim/models/pine_tree/meshes/pine_tree.dae</uri>
-            </mesh>
+            </mesh> -->
+            <cylinder>
+              <length>8</length>
+              <radius>0.09</radius>
+            </cylinder>
+            <cylinder>
+              <length>8</length>
+              <radius>0.09</radius>
+            </cylinder>
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
@@ -499,9 +521,13 @@
       <link name='link'>
         <collision name='collision'>
           <geometry>
-            <mesh>
+            <!-- <mesh>
               <uri>model://gazebo_sim/models/pine_tree/meshes/pine_tree.dae</uri>
-            </mesh>
+            </mesh> -->
+            <cylinder>
+              <length>8</length>
+              <radius>0.09</radius>
+            </cylinder>
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
@@ -576,9 +602,13 @@
       <link name='link'>
         <collision name='collision'>
           <geometry>
-            <mesh>
+            <!-- <mesh>
               <uri>model://gazebo_sim/models/pine_tree/meshes/pine_tree.dae</uri>
-            </mesh>
+            </mesh> -->
+            <cylinder>
+              <length>8</length>
+              <radius>0.09</radius>
+            </cylinder>
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
@@ -653,9 +683,13 @@
       <link name='link'>
         <collision name='collision'>
           <geometry>
-            <mesh>
+            <!-- <mesh>
               <uri>model://gazebo_sim/models/pine_tree/meshes/pine_tree.dae</uri>
-            </mesh>
+            </mesh> -->
+            <cylinder>
+              <length>8</length>
+              <radius>0.09</radius>
+            </cylinder>
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
@@ -730,9 +764,13 @@
       <link name='link'>
         <collision name='collision'>
           <geometry>
-            <mesh>
+            <!-- <mesh>
               <uri>model://gazebo_sim/models/pine_tree/meshes/pine_tree.dae</uri>
-            </mesh>
+            </mesh> -->
+            <cylinder>
+              <length>8</length>
+              <radius>0.09</radius>
+            </cylinder>
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
@@ -807,9 +845,13 @@
       <link name='link'>
         <collision name='collision'>
           <geometry>
-            <mesh>
+            <!-- <mesh>
               <uri>model://gazebo_sim/models/pine_tree/meshes/pine_tree.dae</uri>
-            </mesh>
+            </mesh> -->
+            <cylinder>
+              <length>8</length>
+              <radius>0.09</radius>
+            </cylinder>
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
@@ -884,9 +926,13 @@
       <link name='link'>
         <collision name='collision'>
           <geometry>
-            <mesh>
+            <!-- <mesh>
               <uri>model://gazebo_sim/models/pine_tree/meshes/pine_tree.dae</uri>
-            </mesh>
+            </mesh> -->
+            <cylinder>
+              <length>8</length>
+              <radius>0.09</radius>
+            </cylinder>
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
@@ -961,9 +1007,13 @@
       <link name='link'>
         <collision name='collision'>
           <geometry>
-            <mesh>
+            <!-- <mesh>
               <uri>model://gazebo_sim/models/pine_tree/meshes/pine_tree.dae</uri>
-            </mesh>
+            </mesh> -->
+            <cylinder>
+              <length>8</length>
+              <radius>0.09</radius>
+            </cylinder>
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
@@ -1038,9 +1088,13 @@
       <link name='link'>
         <collision name='collision'>
           <geometry>
-            <mesh>
+            <!-- <mesh>
               <uri>model://gazebo_sim/models/pine_tree/meshes/pine_tree.dae</uri>
-            </mesh>
+            </mesh> -->
+            <cylinder>
+              <length>8</length>
+              <radius>0.09</radius>
+            </cylinder>
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
@@ -1115,9 +1169,13 @@
       <link name='link'>
         <collision name='collision'>
           <geometry>
-            <mesh>
+            <!-- <mesh>
               <uri>model://gazebo_sim/models/pine_tree/meshes/pine_tree.dae</uri>
-            </mesh>
+            </mesh> -->
+            <cylinder>
+              <length>8</length>
+              <radius>0.09</radius>
+            </cylinder>
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
@@ -1192,9 +1250,13 @@
       <link name='link'>
         <collision name='collision'>
           <geometry>
-            <mesh>
+            <!-- <mesh>
               <uri>model://gazebo_sim/models/pine_tree/meshes/pine_tree.dae</uri>
-            </mesh>
+            </mesh> -->
+            <cylinder>
+              <length>8</length>
+              <radius>0.09</radius>
+            </cylinder>
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
@@ -1269,9 +1331,13 @@
       <link name='link'>
         <collision name='collision'>
           <geometry>
-            <mesh>
+            <!-- <mesh>
               <uri>model://gazebo_sim/models/pine_tree/meshes/pine_tree.dae</uri>
-            </mesh>
+            </mesh> -->
+            <cylinder>
+              <length>8</length>
+              <radius>0.09</radius>
+            </cylinder>
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
@@ -1346,9 +1412,13 @@
       <link name='link'>
         <collision name='collision'>
           <geometry>
-            <mesh>
+            <!-- <mesh>
               <uri>model://gazebo_sim/models/pine_tree/meshes/pine_tree.dae</uri>
-            </mesh>
+            </mesh> -->
+            <cylinder>
+              <length>8</length>
+              <radius>0.09</radius>
+            </cylinder>
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
@@ -1423,9 +1493,13 @@
       <link name='link'>
         <collision name='collision'>
           <geometry>
-            <mesh>
+            <!-- <mesh>
               <uri>model://gazebo_sim/models/pine_tree/meshes/pine_tree.dae</uri>
-            </mesh>
+            </mesh> -->
+            <cylinder>
+              <length>8</length>
+              <radius>0.09</radius>
+            </cylinder>
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
@@ -1500,9 +1574,13 @@
       <link name='link'>
         <collision name='collision'>
           <geometry>
-            <mesh>
+            <!-- <mesh>
               <uri>model://gazebo_sim/models/pine_tree/meshes/pine_tree.dae</uri>
-            </mesh>
+            </mesh> -->
+            <cylinder>
+              <length>8</length>
+              <radius>0.09</radius>
+            </cylinder>
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
@@ -1577,9 +1655,13 @@
       <link name='link'>
         <collision name='collision'>
           <geometry>
-            <mesh>
+            <!-- <mesh>
               <uri>model://gazebo_sim/models/pine_tree/meshes/pine_tree.dae</uri>
-            </mesh>
+            </mesh> -->
+            <cylinder>
+              <length>8</length>
+              <radius>0.09</radius>
+            </cylinder>
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
@@ -1654,9 +1736,13 @@
       <link name='link'>
         <collision name='collision'>
           <geometry>
-            <mesh>
+            <!-- <mesh>
               <uri>model://gazebo_sim/models/pine_tree/meshes/pine_tree.dae</uri>
-            </mesh>
+            </mesh> -->
+            <cylinder>
+              <length>8</length>
+              <radius>0.09</radius>
+            </cylinder>
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
@@ -1731,9 +1817,13 @@
       <link name='link'>
         <collision name='collision'>
           <geometry>
-            <mesh>
+            <!-- <mesh>
               <uri>model://gazebo_sim/models/pine_tree/meshes/pine_tree.dae</uri>
-            </mesh>
+            </mesh> -->
+            <cylinder>
+              <length>8</length>
+              <radius>0.09</radius>
+            </cylinder>
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
@@ -1808,9 +1898,13 @@
       <link name='link'>
         <collision name='collision'>
           <geometry>
-            <mesh>
+            <!-- <mesh>
               <uri>model://gazebo_sim/models/pine_tree/meshes/pine_tree.dae</uri>
-            </mesh>
+            </mesh> -->
+            <cylinder>
+              <length>8</length>
+              <radius>0.09</radius>
+            </cylinder>
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
@@ -1885,9 +1979,13 @@
       <link name='link'>
         <collision name='collision'>
           <geometry>
-            <mesh>
+            <!-- <mesh>
               <uri>model://gazebo_sim/models/pine_tree/meshes/pine_tree.dae</uri>
-            </mesh>
+            </mesh> -->
+            <cylinder>
+              <length>8</length>
+              <radius>0.09</radius>
+            </cylinder>
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
@@ -1962,9 +2060,13 @@
       <link name='link'>
         <collision name='collision'>
           <geometry>
-            <mesh>
+            <!-- <mesh>
               <uri>model://gazebo_sim/models/pine_tree/meshes/pine_tree.dae</uri>
-            </mesh>
+            </mesh> -->
+            <cylinder>
+              <length>8</length>
+              <radius>0.09</radius>
+            </cylinder>
           </geometry>
           <max_contacts>10</max_contacts>
           <surface>
