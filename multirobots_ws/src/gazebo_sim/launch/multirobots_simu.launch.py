@@ -1,7 +1,7 @@
 from launch import LaunchDescription
 from launch.actions import IncludeLaunchDescription, ExecuteProcess, SetEnvironmentVariable, DeclareLaunchArgument
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import PathJoinSubstitution, LaunchConfiguration
+from launch.substitutions import PathJoinSubstitution, LaunchConfiguration, PythonExpression
 from launch_ros.substitutions import FindPackageShare
 from launch.conditions import IfCondition
 from launch_ros.actions import Node
@@ -78,6 +78,7 @@ def generate_launch_description():
             'MicroXRCEAgent udp4 -p 8888'
         ],
         cwd="/home/multirobots/multirobots_ws/src/Micro-XRCE-DDS-Agent/build",
+        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('nb_drones'), '" != "0"'])),
         shell=True
     )
     
@@ -86,6 +87,7 @@ def generate_launch_description():
             './squashfs-root/AppRun > /dev/null 2>&1'
         ],
         cwd = '/home/multirobots/multirobots_ws/src/QGroundControl.AppImage',
+        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('nb_drones'), '" != "0"'])),
         shell=True
     )
     

@@ -230,7 +230,7 @@ Semaine 10 :
 => package sdf2urdf testé mais pas concluant : sûrement dû aux mêmes limitations
 - Commande du script permettant la limitation de la fq des CPUs mise en commentaire : RTF passé de 30% à 35-40% (ni le CPU ni la RAM ne sont saturés -> peut-être plus un problème avec l'interface graphique / utilisation du gpu)
 => Le Render/3D:0 (observé avec sudo intel_gpu_top, installé via sudo apt install intel-gpu-tools) est à 85-99% ce qui est élevé et certainement le facteur limitant
-=> RTF à ~90% avec seulement 2 summits, et à ~50% avec seuelement 2 drones => En passant la résolution de la caméra du drone de 1280x960 à 640x480 => RTF à ~70% pour seulement 2 drones
+=> RTF à ~90% avec seulement 2 summits, et à ~50% avec seulement 2 drones => En passant la résolution de la caméra du drone de 1280x960 à 640x480 => RTF à ~70% pour seulement 2 drones
 -> GPU pas assez puissant pour des caméras de haute résolution à priori / pour plusieurs robots => à partir de 3 robots simulés : GPU saturé -> RTF ~40%
 - Correctifs pour pouvoir utiliser tous les arguments du launchfile (rviz / nb_summits / nb_drones / rosbag)
 - Ajout d'un nouveau launchfile pour pouvoir rejouer les données enregistrées avec "ros2 bag record" (uniquement dans rviz, en enregistrant les topics tf, tf_static, robot_description (mais celui-ci n'est à priori pas nécessaire) et ceux des capteurs (pour le moment juste le scan du lidar))
@@ -240,3 +240,30 @@ Semaine 10 :
 => Puis test avec le chemin absolu, mais n'a pas fonctionné -> impossible pour rviz d'ouvrir les fichiers de cette façon 
 => Donc utilisation de package://pkg/..., ce qui a nécessité au préalable de modifier le CMakeLists.txt de PX4-Autopilots pour ajouter le dossier contenant les modèles dans install/... (par ailleurs, chose qui a porté à confusion, le nom du projet est px4 et non PX4-Autopilot, qui est donc bien un package ros)
 - Création d'un node pour publier un tf_static entre la frame world et la frame de base du summit et du px4, pour pouvoir utiliser cette frame world comme fixed_frame dans rviz, et ainsi visualiser différents robots en même temps
+
+Semaine 11 :
+
+- Réunion d'équipe et courte présentation de mes travaux
+- Utilisation des données de position publiées dans le topic d'odométrie du drone pour publier une tf (dynamique) entre la frame fixe (world) et la frame de base du drone (base_link) -> static-tf_publisher modifié pour créer et publier cette tf en s'abonnant au topic
+=> Les repères du drone et de rviz étant différents : inversion des axes  x et y et rotation de -PI/2 autour de l'axe x nécessaires pour avoir les mêmes mouvements entre gazebo et rviz
+- Dans les topics créés par PX4-Autopilot, pas de topic contenant uniquement les données du lidar (et pareil pour d'autres capteurs) -> création d'un bridge gz pour avoir accès au topic du lidar (gz) dans ros2
+=> Le node ros_gz_bridge crash car au moment de créer le pont, le topic du lidar n'a pas encore été créé
+- Création d'un node basique pour du suivi de trajectoire, à partir d'un ensemble de points définis dans le fichier de configuration config/path.yaml, et création d'un objet de type Path, qui sera par le suite envoyé comme msg dans un topic pour pouvoir être visualisé dans rviz 
+- Changement de moteur de physique => changer l'attribut type de la balise physics ne semble pas avoir d'effet (toujours dart utilisé par défaut) -> Mais avec les balises suivantes : 
+<dart>
+  <collision_detector>bullet</collision_detector>
+  <solver>
+    <solver_type>pgs</solver_type>
+  </solver>
+</dart>
+<bullet>
+  <solver>
+    <iters>100</iters>
+  </solver>
+</bullet>
+placées dans la balise physics : Physics Collision Detector et Physics Solver remplacés par ceux de bullet (dart est toujours le moteur physique utilisé par défaut) => RTF diminué de ~15/20%, mais la simulation des contacts au niveau des roues est meilleure (moins de bloquages/glissements, même si toujours loin d'être parfait, notamment sur les pentes)
+=> Par contre les collisions avec les obstacles (arbres) ne fonctionnent plus bien -> à priori bullet ne fonctionne pas pour les collisions liées à certains mesh (géométrie concave)
+=> Géométrie des arbres remplacée par des cylindres (dans la balise collision uniquement)
+- Correctifs apportés au node summit_follow_path pour que l'orientation désirée soit atteinte
+- Le suivi de trajectoire fonctionne correctement (vérifié dans rviz), mais pas dans gazebo si le summit se bloque dans une pente, car même si cela empêche le robot de tourner, l'odométrie ne le prend pas en compte et devient faussée
+- Si aucun drone n'est spawn, le static_tf_publisher ne fonctionne pas pour le summit
