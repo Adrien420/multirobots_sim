@@ -39,7 +39,8 @@ class StaticTfPublisher(Node):
         self.tf_px4.transform.translation.y = float(msg.position[0]) - 1.0
         self.tf_px4.transform.translation.z = -float(msg.position[2])
 
-        q_rviz =  (Rotation.from_quat(msg.q) * Rotation.from_euler('x', np.deg2rad(-90))).as_quat()
+        q_rviz =  (Rotation.from_quat(np.array([msg.q[2], msg.q[1], msg.q[0], msg.q[3]])) * Rotation.from_euler('z', np.deg2rad(-90))).as_quat()
+        #print((Rotation.from_quat(np.array([msg.q[2], msg.q[1], msg.q[0], msg.q[3]])) * Rotation.from_euler('z', np.deg2rad(-90))).as_euler('xyz', degrees=True))
         self.tf_px4.transform.rotation.x = float(q_rviz[0])
         self.tf_px4.transform.rotation.y = float(q_rviz[1])
         self.tf_px4.transform.rotation.z = float(q_rviz[2])

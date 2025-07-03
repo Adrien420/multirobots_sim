@@ -135,7 +135,7 @@ class Px4FollowPath(Node) :
         msg.position[0] = target_pose.position.y
         msg.position[1] = target_pose.position.x
         msg.position[2] = -target_pose.position.z
-        msg.yaw = -self.get_yaw_from_quaternion(target_pose.orientation)
+        msg.yaw = self.get_yaw_from_quaternion(target_pose.orientation) + np.pi/2
 
         dx = target_pose.position.y - self.vehicle_local_position.x
         dy = target_pose.position.x - self.vehicle_local_position.y
@@ -143,10 +143,10 @@ class Px4FollowPath(Node) :
         distance = math.sqrt(dx**2+dy**2+dz**2)
 
         target_angle = self.get_yaw_from_quaternion(target_pose.orientation)
-        angle_target_error = self.normalize_angle(target_angle - self.vehicle_local_position.heading)
+        angle_target_error = self.normalize_angle(target_angle + np.pi/2 - self.vehicle_local_position.heading)
         print(f'target : {target_angle} / angle_target_error : {angle_target_error} / distance : {distance} / {dx} / {dy} / {dz}')
 
-        if distance < 0.01 and abs(angle_target_error) < 0.035:
+        if distance < 0.05 and abs(angle_target_error) < 0.035:
             if self.current_target_pose < len(self.path.poses)-1:
                 self.current_target_pose += 1
                 self.get_logger().info(f"Reached a waypoint, {len(self.path.poses)-self.current_target_pose} remaining.")

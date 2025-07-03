@@ -52,6 +52,7 @@ Problème : 2025-06-02 11:17:08.438 [RTPS_READER_HISTORY Error] Change payload s
 Cause : compatiblity issue in the msgs of PX4-Autopilot/msgs and the px4_msgs/msg
 Solution : Basculer sur la branche main du package px4_msgs
 
+Problème : px4 ne spawnant pas (instance already running) => ps aux | grep px4 => kill -9 <id_px4_process_running>
 
 	Points à priori obsolètes (mais pas supprimés dans le doute) :
 	

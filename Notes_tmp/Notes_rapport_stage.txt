@@ -267,3 +267,8 @@ placées dans la balise physics : Physics Collision Detector et Physics Solver r
 - Correctifs apportés au node summit_follow_path pour que l'orientation désirée soit atteinte
 - Le suivi de trajectoire fonctionne correctement (vérifié dans rviz), mais pas dans gazebo si le summit se bloque dans une pente, car même si cela empêche le robot de tourner, l'odométrie ne le prend pas en compte et devient faussée
 - Si aucun drone n'est spawn, le static_tf_publisher ne fonctionne pas pour le summit
+- Incohérences dans les orientations du drone, entre rviz et gazebo (orientation entre les frames world et base_link pour passer du repère NED du drone au repère de rviz (NWU à priori ?) -> tourner de 180° autour de l'axe x (angles d'euler) ne donne pas l'orientation attendue)
+=> Après vérification de l'orientation initiale du drone (quaternions donnés par l'odométrie convertis en angles d'euler) -> repère tourné de ~90° autour de x par rapport au repère NED, malgré une bonne orientation dans gazebo
+=> Pour gazebo, il manquait un +pi/2 à l'angle autour de z visé (Pour passer du repère NED à celui de gz : inversion des axes x et y, changement de sens de l'axe z, et rotation de pi/2 autour du nouvel axe z (réalisé en dessinnant les repères))
+=> Pour rviz, problème réglé en inversant les quaternions x et z reçus de l'odométrie, et en effectuant ensuite une rotation de -90° autour de l'axe z
+- Pour le node ros_gz_bridge qui doit être delayed le temps que le topic du lidar du drone soit créé : utilisation de time.sleep dans une boucle while (dans une OpaqueFunction) -> bloque tous les launchfiles => utilisation de async & await pour attendre de manière asynchrone -> pas supporté dans ce contexte
