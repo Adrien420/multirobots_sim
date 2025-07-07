@@ -36,7 +36,8 @@ setup(
             'summit_teleop = gazebo_sim.summit_teleop:main',
             'static_tf_publisher = gazebo_sim.static_tf_publisher:main',
             'summit_follow_path = gazebo_sim.summit_follow_path:main',
-            'px4_follow_path = gazebo_sim.px4_follow_path:main'
+            'px4_follow_path = gazebo_sim.px4_follow_path:main',
+            'wait_topic_creation = gazebo_sim.wait_topic_creation:main',
         ],
     },
 )

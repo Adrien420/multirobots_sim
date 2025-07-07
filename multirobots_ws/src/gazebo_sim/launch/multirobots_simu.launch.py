@@ -1,10 +1,11 @@
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, ExecuteProcess, SetEnvironmentVariable, DeclareLaunchArgument
+from launch.actions import IncludeLaunchDescription, ExecuteProcess, SetEnvironmentVariable, DeclareLaunchArgument, RegisterEventHandler
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import PathJoinSubstitution, LaunchConfiguration, PythonExpression
 from launch_ros.substitutions import FindPackageShare
 from launch.conditions import IfCondition
 from launch_ros.actions import Node
+from launch.event_handlers import OnProcessExit
 
 import os
 from ament_index_python import get_package_share_directory, get_package_prefix
@@ -41,6 +42,7 @@ def generate_launch_description():
                 'forest2.sdf '
             ]),
             '-r', # Allow to start the simulation as soon as Gazebo is launched
+            '2>&1 | grep -v "not defined in SDF"'
         ],
         shell=True
     )
@@ -102,7 +104,31 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory('gazebo_sim'), 'launch', 'multiple_spawn_summit.launch.py')
         ),
-        launch_arguments={'nb_summits':nb_summits, 'use_rosbag':use_rosbag}.items()
+        launch_arguments={'nb_summits':nb_summits, 'use_rosbag':use_rosbag}.items(),
+        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('nb_drones'), '" == "0"'])),
+    )
+
+    wait_px4_ready_cmd = Node(
+        package='gazebo_sim',
+        executable='wait_topic_creation',
+        parameters=[{"use_sim_time": True, "robot_type":"drone"}],
+        output='screen',
+        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('nb_drones'), '" != "0"'])),
+    )
+
+    delayed_summit_spawner_cmd = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('gazebo_sim'), 'launch', 'multiple_spawn_summit.launch.py')
+        ),
+        launch_arguments={'nb_summits':nb_summits, 'use_rosbag':use_rosbag}.items(),
+        condition=IfCondition(PythonExpression(['"', LaunchConfiguration('nb_drones'), '" != "0"'])),
+    )
+
+    event_handler_summit_spawner_cmd = RegisterEventHandler(
+        OnProcessExit(
+            target_action=wait_px4_ready_cmd,
+            on_exit=[delayed_summit_spawner_cmd]
+        ),
     )
 
     ld = LaunchDescription([
@@ -128,5 +154,7 @@ def generate_launch_description():
 
     # Summit
     ld.add_action(summit_spawner_cmd)
+    ld.add_action(wait_px4_ready_cmd)
+    ld.add_action(event_handler_summit_spawner_cmd)
 
     return ld

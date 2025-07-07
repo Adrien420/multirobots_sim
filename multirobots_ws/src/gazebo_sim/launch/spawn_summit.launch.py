@@ -2,12 +2,13 @@
 
 import os, yaml, datetime
 from launch.launch_description import LaunchDescription
-from launch.actions import DeclareLaunchArgument, OpaqueFunction, TimerAction, ExecuteProcess
+from launch.actions import DeclareLaunchArgument, OpaqueFunction, TimerAction, ExecuteProcess, RegisterEventHandler
 from launch.substitutions import LaunchConfiguration, PathJoinSubstitution, Command
 from launch_ros.substitutions import FindPackageShare
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 from launch.conditions import IfCondition
+from launch.event_handlers import OnProcessExit
 
 def generate_yaml_with_namespace(context, summit_id):
     namespace = f"summit_xl_{summit_id}"
@@ -61,7 +62,7 @@ def launch_setup(context):
     #robot_description_config = ParameterValue(Command(['xacro', ' ', xacro_file]), value_type=str)
 
     robot_state_publisher_node = TimerAction(
-        period=15.0,
+        period=3.0,
         actions=[
             Node(
                 package="robot_state_publisher",
@@ -127,7 +128,7 @@ def launch_setup(context):
         arguments=["robotnik_base_controller"],
         parameters=[{"use_sim_time": True}],
     )   
-    
+
     joint_broadcaster_spawner = Node(
         package="controller_manager",
         executable="spawner",
