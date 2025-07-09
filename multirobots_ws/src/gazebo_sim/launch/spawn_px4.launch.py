@@ -69,7 +69,10 @@ def launch_setup(context):
         arguments=[
             #'clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
             f'world/forest/model/x500_{drone_id}/link/link/sensor/lidar_2d_v2/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
-            '--log-level', 'info'
+            f'/world/forest/model/x500_{drone_id}/link/camera_link/sensor/imager/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
+            f'/world/forest/model/x500_{drone_id}/link/camera_link/sensor/imager/image@sensor_msgs/msg/Image[gz.msgs.Image',
+
+            '--ros-args', '--log-level', 'info'
         ],
         parameters=[{"use_sim_time": True}],
         output='screen'
@@ -97,7 +100,7 @@ def launch_setup(context):
     spawn_px4_cmds = []
 
     spawn_px4_cmds.append(robot_state_publisher_node)
-    #spawn_px4_cmds.append(gz_bridge)
+    spawn_px4_cmds.append(gz_bridge)
     spawn_px4_cmds.append(spawn_px4_cmd)
 
     return spawn_px4_cmds

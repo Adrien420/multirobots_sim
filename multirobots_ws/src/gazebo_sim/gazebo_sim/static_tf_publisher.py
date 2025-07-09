@@ -36,10 +36,10 @@ class StaticTfPublisher(Node):
         self.tf_px4.header.frame_id  = 'world'
         self.tf_px4.child_frame_id = 'base_link'
         self.tf_px4.transform.translation.x = float(msg.position[1])
-        self.tf_px4.transform.translation.y = float(msg.position[0]) - 1.0
-        self.tf_px4.transform.translation.z = -float(msg.position[2])
+        self.tf_px4.transform.translation.y = float(msg.position[0])
+        self.tf_px4.transform.translation.z = -float(msg.position[2]) + 0.24
 
-        q_rviz =  (Rotation.from_quat(np.array([msg.q[2], msg.q[1], msg.q[0], msg.q[3]])) * Rotation.from_euler('z', np.deg2rad(-90))).as_quat()
+        q_rviz =  (Rotation.from_quat(np.array([msg.q[2], msg.q[1], msg.q[0], msg.q[3]])) * Rotation.from_euler('z', np.deg2rad(-100))).as_quat()
         #print((Rotation.from_quat(np.array([msg.q[2], msg.q[1], msg.q[0], msg.q[3]])) * Rotation.from_euler('z', np.deg2rad(-90))).as_euler('xyz', degrees=True))
         self.tf_px4.transform.rotation.x = float(q_rviz[0])
         self.tf_px4.transform.rotation.y = float(q_rviz[1])
@@ -53,7 +53,7 @@ class StaticTfPublisher(Node):
         self.static_tf_summit.child_frame_id = 'summit_xl_1/summit_xl_odom'
 
         self.static_tf_summit.transform.translation.x = 0.0
-        self.static_tf_summit.transform.translation.y = 0.0
+        self.static_tf_summit.transform.translation.y = 1.0
         self.static_tf_summit.transform.translation.z = 0.0
 
         self.static_tf_summit.transform.rotation.x = 0.0
