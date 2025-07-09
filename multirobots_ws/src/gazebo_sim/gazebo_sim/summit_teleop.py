@@ -29,7 +29,6 @@ class SummitTeleop(Node) :
         
         # Parameters
         self.declare_parameter('summit_id', 1)
-        
         self.summit_name = '/summit_xl_' + str(self.get_parameter('summit_id').value)
 
         # Configure QoS profile for publishing and subscribing

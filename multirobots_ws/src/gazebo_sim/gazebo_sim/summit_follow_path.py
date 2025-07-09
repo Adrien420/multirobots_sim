@@ -10,10 +10,16 @@ class SummitFollowPath(Node):
     def __init__(self):
         super().__init__('summit_follow_path')
 
-        self.cmd_pub = self.create_publisher(TwistStamped, '/summit_xl_1/robotnik_base_controller/cmd_vel', 10)
-        self.create_subscription(Odometry, '/summit_xl_1/robotnik_base_controller/odom', self.odom_callback, 10)
+        self.declare_parameter('summit_id', 1)
+        self.summit_prefix = '/summit_xl_' + str(self.get_parameter('summit_id').value)
 
-        self.path = self.load_path_yaml('/home/multirobots/multirobots_ws/install/gazebo_sim/share/gazebo_sim/config/summit_path.yaml', 'traj1')
+        self.declare_parameter('path_name', 'path1')
+        self.declare_parameter('velocity', 2.0)
+
+        self.cmd_pub = self.create_publisher(TwistStamped, self.summit_prefix + '/robotnik_base_controller/cmd_vel', 10)
+        self.create_subscription(Odometry, self.summit_prefix + '/robotnik_base_controller/odom', self.odom_callback, 10)
+
+        self.path = self.load_path_yaml('/home/multirobots/multirobots_ws/install/gazebo_sim/share/gazebo_sim/config/summit_path.yaml', self.get_parameter('path_name').value)
         self.current_odom_pose = None
         self.current_target_pose = 0
         self.timer = self.create_timer(0.05, self.follow_path)  # 20 Hz
@@ -66,7 +72,7 @@ class SummitFollowPath(Node):
         target_angle = self.get_yaw_from_quaternion(target.orientation)
         angle_error = self.normalize_angle(angle_to_goal - yaw)
         angle_target_error = self.normalize_angle(target_angle - yaw)
-        print(f'target : {target_angle} / angle_error : {angle_error} / angle_target_error : {angle_target_error} / distance : {distance}')
+        print(f'target : {target_angle} / current_angle : {yaw} / angle_error : {angle_error} / angle_target_error : {angle_target_error} / distance : {distance}')
 
         if distance < 0.01 and abs(angle_target_error) < 0.035:
             if self.current_target_pose < len(self.path.poses)-1:
@@ -88,7 +94,7 @@ class SummitFollowPath(Node):
         cmd = TwistStamped()
         cmd.header.stamp = self.get_clock().now().to_msg()
         cmd.header.frame_id = ''
-        cmd.twist.linear.x = min(0.5, k_linear * distance)
+        cmd.twist.linear.x = min(float(self.get_parameter('velocity').value), k_linear * distance)
         if distance < 0.01:
             cmd.twist.linear.x = 0.0
             cmd.twist.angular.z = k_angular * angle_target_error

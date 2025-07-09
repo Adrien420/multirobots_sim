@@ -14,6 +14,7 @@ class Px4FollowPath(Node) :
         
         # Parameters
         self.declare_parameter('drone_id', 1)
+        self.declare_parameter('path_name', 'path1')
 
         # Configure QoS profile for publishing and subscribing
         qos_profile = QoSProfile(
@@ -47,7 +48,7 @@ class Px4FollowPath(Node) :
         # Create a timer to publish control commands
         self.timer = self.create_timer(0.1, self.timer_callback)
 
-        self.path = self.load_path_yaml('/home/multirobots/multirobots_ws/install/gazebo_sim/share/gazebo_sim/config/px4_path.yaml', 'traj1')
+        self.path = self.load_path_yaml('/home/multirobots/multirobots_ws/install/gazebo_sim/share/gazebo_sim/config/px4_path.yaml', self.get_parameter('path_name').value)
         self.current_target_pose = 0
 
     def load_path_yaml(self, yaml_file, path_name):
@@ -146,7 +147,7 @@ class Px4FollowPath(Node) :
         angle_target_error = self.normalize_angle(target_angle + np.pi/2 - self.vehicle_local_position.heading)
         print(f'target : {target_angle} / angle_target_error : {angle_target_error} / distance : {distance} / {dx} / {dy} / {dz}')
 
-        if distance < 0.05 and abs(angle_target_error) < 0.035:
+        if distance < 0.2 and abs(angle_target_error) < 0.035:
             if self.current_target_pose < len(self.path.poses)-1:
                 self.current_target_pose += 1
                 self.get_logger().info(f"Reached a waypoint, {len(self.path.poses)-self.current_target_pose} remaining.")
