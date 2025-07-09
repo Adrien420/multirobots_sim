@@ -20,7 +20,6 @@ def launch_setup(context):
                 os.path.join(get_package_share_directory('gazebo_sim'), 'launch', 'spawn_summit.launch.py')
             ),
             launch_arguments={
-                'use_rosbag':use_rosbag,
                 'summit_id':str(i),
                 'x_pose':str(i-1)
             }.items()

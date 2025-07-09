@@ -1,7 +1,7 @@
 import os
 
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess, OpaqueFunction
+from launch.actions import DeclareLaunchArgument, ExecuteProcess, OpaqueFunction, TimerAction
 from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
@@ -30,8 +30,8 @@ def launch_setup(context):
 
     play_summit_cmds = []
 
-    play_summit_cmds.append(rviz)
     play_summit_cmds.append(rosbag_play)
+    play_summit_cmds.append(rviz)
 
     return play_summit_cmds
 
