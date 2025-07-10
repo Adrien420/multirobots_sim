@@ -1,0 +1,66 @@
+	I - Initialiser le git :
+	
+1 - Créer un repository sur github
+
+2 - Initialiser le dossier local en tant que dépôt Git : git init (à la racine de ce dossier)
+
+3 - Lier le dépôt local et le dépôt distant : git remote add origin <url_depot_distant>
+
+4 - Eventuellement changer de branche : git switch <branch>
+
+5 - Lier la branche locale avec la branche distante : git push --set-upstream <remote> <remote_branch>
+	
+	II - Créer un submodule pour un dépôt déjà cloné et modifié :
+	
+1 - Forker le dépôt sur github
+
+2 - Créer un backup du dépôt cloné localement (mv PX4-Autopilot PX4-Autopilot_backup par ex)
+
+3 - A la racine du dépôt local, ajouter le submodule avec la commande : git submodule add -b <branch> <url_fork> <submodule_path> (ex : git submodule add -b main https://github.com/Adrien420/PX4-Autopilot.git multirobots_ws/src/PX4-Autopilot)
+
+4 - Modifier le submodule (à la main, ou avec rsync -a <source> <destination>) => Attention, tout modifier change le remote pour lé dépôt d'origine et non le fork !
+
+5 - Dans le dossier du submodule, commit & push les modifs sur le fork : 
+Vérifier la branche et le remote actuels avec : git status & git remote -v
+Eventuellement : git switch <branch> 
+Puis : git add . && git commit -m "modifs" && git push <remote> <branch>
+
+6 - Ajouter et commit le submodule : git add <submodule_name> && git commit -m "Initialisation du submodule <submodule_name>"
+
+7 - Push le projet principal sur la branche distante : git push origin master (git push <remote> <branch>)
+
+Cas particulier de Micro-XRCE-DDS-Agent :
+
+Le dépôt avait été cloné avec un tag et non une branche => submodule ajouté sans branche, puis (dans le dossier de ce submodule), utilisation de git checkout tags/v2.4.2 pour se mettre sur le bon tag. Mais un tag est associé à un commit spécifique, et est donc immuable (pas possible de commit & push dessus), donc création à partir de là d'une noouvelle branche, avec git switch -c <branch>, et push de cette branche sur le remote avec git push -u origin <branch>
+
+Cas particulier de PX4-Autopilot :
+
+Comme ce dépôt contient également des submodules, après l'avoir ajouté comme submodule du projet principal, il faut aller dans son dossier et taper "git submodule update --init --recursive", pour initialiser ses propres submodules
+
+	III - Autre
+	
+- Supprimer un submodule :
+
+Si pas déjà fait : git add .../.gitmodules
+git config -f .gitmodules --remove-section submodule.<submodule_name>
+git rm --cached <submodule_name>
+
+- Modifier la branche par défaut d'un submodule :
+
+Modifiable dans le .gitmodules
+
+- Problème d'authentification :
+
+Dans les paramètres de Github, créer un token classic et l'utiliser comme mdp (cf https://dev.to/shafia/support-for-password-authentication-was-removed-please-use-a-personal-access-token-instead-4nbk)
+
+Token actuel :
+
+- Fichiers trop volumineux à push (>100Mo) :
+
+Utilisation de Git LFS (Large File Storage), installé avec : sudo apt-get install git-lfs
+Puis dans le dépôt local : git lfs install && git lfs track "files" (ex : git lfs track "*.zip") && git add .gitattributes
+Puis commit & push comme d'habitude
+
+- Jsp si c'est utile :
+
+Push les submodules avec : git push --recurse-submodules=on-demand

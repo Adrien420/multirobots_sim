@@ -5,6 +5,7 @@
 [submodule "multirobots_ws/src/Micro-XRCE-DDS-Agent"]
 	path = multirobots_ws/src/Micro-XRCE-DDS-Agent
 	url = https://github.com/Adrien420/Micro-XRCE-DDS-Agent.git
+	branch = multirobots_sim
 [submodule "multirobots_ws/src/px4_msgs"]
 	path = multirobots_ws/src/px4_msgs
 	url = https://github.com/Adrien420/px4_msgs.git
@@ -12,8 +13,12 @@
 [submodule "multirobots_ws/src/robotnik_sensors"]
 	path = multirobots_ws/src/robotnik_sensors
 	url = https://github.com/Adrien420/robotnik_sensors.git
-	branch = ros-devel
+	branch = humble-devel
 [submodule "multirobots_ws/src/PX4-Autopilot"]
 	path = multirobots_ws/src/PX4-Autopilot
 	url = https://github.com/Adrien420/PX4-Autopilot.git
 	branch = main
+[submodule "multirobots_ws/src/sdformat_urdf"]
+	path = multirobots_ws/src/sdformat_urdf
+	url = https://github.com/Adrien420/sdformat_urdf.git
+	branch = humble

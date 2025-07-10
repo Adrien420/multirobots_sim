@@ -1,2 +1,4 @@
 *.AppImage filter=lfs diff=lfs merge=lfs -text
 QGroundControl* filter=lfs diff=lfs merge=lfs -text
+multirobots_ws/src/QGroundControl.AppImage/QGroundControl-x86_64.AppImage filter=lfs diff=lfs merge=lfs -text
+QGroundControl-x86_64.AppImage filter=lfs diff=lfs merge=lfs -text

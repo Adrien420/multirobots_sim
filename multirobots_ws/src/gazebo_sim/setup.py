@@ -12,6 +12,8 @@ setup(
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
         ('share/' + package_name + '/config', glob('config/*.yaml')),
+        ('share/' + package_name + '/rviz', glob('rviz/*.rviz')),
+        #('share/' + package_name + '/rosbag', glob('rosbag/*')),
         ('share/' + package_name + '/launch', glob('launch/*.launch.py')),
         ('share/' + package_name + '/urdf', glob('urdf/*.urdf')),
         ('share/' + package_name + '/urdf/meshes', glob('urdf/meshes/*')),
@@ -31,7 +33,11 @@ setup(
     entry_points={
         'console_scripts': [
             'px4_teleop = gazebo_sim.px4_teleop:main',
-            'summit_teleop = gazebo_sim.summit_teleop:main'
+            'summit_teleop = gazebo_sim.summit_teleop:main',
+            'static_tf_publisher = gazebo_sim.static_tf_publisher:main',
+            'summit_follow_path = gazebo_sim.summit_follow_path:main',
+            'px4_follow_path = gazebo_sim.px4_follow_path:main',
+            'wait_topic_creation = gazebo_sim.wait_topic_creation:main',
         ],
     },
 )

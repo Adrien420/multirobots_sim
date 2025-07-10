@@ -1,0 +1,88 @@
+	
+=> Problème de target : 
+
+nano src/modules/simulation/simulator_mavlink/sitl_targets_gazebo-classic.cmake 
+Et ajouter le modèle (en l'occurrence x500) dans "set(models..."
++ après la ligne 173 (dans le "if(gazebo-classic_airframe_found)") ajouter "px4_add_board_cmake_build_target(px4_sitl gz_${model})" à la ligne suivante
+
+=> Modif du package Micro-XRCE-DDS-Agent : "set(_fastdds_version 2.13)
+					    set(_fastdds_tag v2.13.6)" aux lignes 98-99 du CMakeLists.txt
+
+	Lancement (Solution sans launch file, temporaire) :
+	
+Terminal 1 (Gazebo Harmonic) :
+
+export GZ_SIM_RESOURCE_PATH=$GZ_SIM_RESOURCE_PATH:~/turtlebot3_ws/install/gazebo_sim/share:~/turtlebot3_ws/src/PX4-Autopilot/Tools/simulation/gz/models
+export GZ_SIM_SERVER_CONFIG_PATH=~/turtlebot3_ws/src/PX4-Autopilot/Tools/simulation/gz/server.config
+export GZ_SIM_SYSTEM_PLUGIN_PATH=~/turtlebot3_ws/src/PX4-Autopilot/build/px4_sitl_default/src/modules/simulation/gz_plugins/
+gz sim ~/turtlebot3_ws/src/gazebo_sim/worlds/forest.sdf 
+
+Terminal 2 (MicroAgent) :
+
+cd ~/multirobots_ws/src/Micro-XRCE-DDS-Agent/build
+cmake ..
+make
+sudo make install
+sudo ldconfig /usr/local/lib/
+MicroXRCEAgent udp4 -p 8888
+
+Terminal 3 (QGroundController) :
+
+cd ~/turtlebot3_ws/src/QGroundControl.AppImage
+./squashfs-root/AppRun
+
+Terminal 4 (PX4) :
+
+PX4_GZ_STANDALONE=1 PX4_SYS_AUTOSTART=4001 PX4_SIM_MODEL=gz_x500 PX4_GZ_MODEL_POSE="0,0,1,0,0,0" PX4_GZ_WORLD=forest ~/turtlebot3_ws/src/PX4-Autopilot/build/px4_sitl_default/bin/px4 -i 1
+
+=> Pour spawner plusieurs drones x500 : même commande avec une valeur différente pour -i
+
+=> logs situés dans /home/multirobots/turtlebot3_ws/src/PX4-Autopilot/build/px4_sitl_default/rootfs/log/ (utiliser le site https://review.px4.io/ pour les visualiser)
+
+Enelever warnings liés aux désynchros dans le terminal de px4 :
+open QGroundControl->cilck left top side->find parameter in the left menu->search UXRCE_DDS_SYNCT-> set two parameters to value disable
+[/quote]
+
+ros2 run gazebo_sim px4_teleop --ros-args -p drone_id:=2 => pour passer un paramètre à un node
+
+
+	Troubleshooting :
+	
+Problème : 2025-06-02 11:17:08.438 [RTPS_READER_HISTORY Error] Change payload size of '220' bytes is larger than the history payload size of '207' bytes and cannot be resized. -> Function can_change_be_added_nts
+Cause : compatiblity issue in the msgs of PX4-Autopilot/msgs and the px4_msgs/msg
+Solution : Basculer sur la branche main du package px4_msgs
+
+Problème : px4 ne spawnant pas (instance already running) => ps aux | grep px4 => kill -9 <id_px4_process_running>
+
+	Points à priori obsolètes (mais pas supprimés dans le doute) :
+	
+export PATH=$PATH:~/turtlebot3_ws/src/PX4-Autopilot/build/px4_sitl_default/bin/px4-alias.sh 
+
+(conversion .jinja.sdf -> .sdf
+
+python3 PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/scripts/jinja_gen.py     --stdout     --mavlink_udp_port=14560     --mavlink_tcp_port=4560     --mavlink_id=1     PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/models/iris/iris.sdf.jinja     PX4-Autopilot/Tools/simulation/gazebo-classic/sitl_gazebo-classic/ > gazebo_sim/models/iris/iris.sdf
+
+)
+
+sudo apt install ros-dev-tools   ?
+apt-get install ros-humble-ros-gzharmonic   ?
+
+ls ~/.simulation-gazebo
+(python3 ~/turtlebot3_ws/src/PX4-Autopilot/Tools/simulation/gz/simulation-gazebo --world windy)
+
+Crash Gazebo : export QT_QPA_PLATFORM=xcb
+
+QGroundController:
+sudo usermod -a -G dialout $USER
+sudo apt-get remove modemmanager -y
+sudo apt install gstreamer1.0-plugins-bad gstreamer1.0-libav gstreamer1.0-gl -y
+sudo apt install libqt5gui5 -y
+sudo apt install libfuse2 -y
+
+Configurations : 
+	
+(PX4 :
+
+cd ~/turtlebot3_ws/src/PX4-Autopilot
+bash ./Tools/setup/ubuntu.sh
+make px4_sitl) => plus nécessaire grâce au dockerfile pour le .sh et au volume enregistré pour le make (make à refaire uniquement si modifs dans les fichiers)

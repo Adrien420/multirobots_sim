@@ -29,7 +29,7 @@ def launch_setup(context):
 def generate_launch_description():
     
     ld = LaunchDescription([
-        DeclareLaunchArgument('nb_drones', default_value='4'),
+        DeclareLaunchArgument('nb_drones', default_value='2'),
         OpaqueFunction(function=launch_setup)
     ])
 

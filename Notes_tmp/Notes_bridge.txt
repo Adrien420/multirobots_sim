@@ -1,0 +1,44 @@
+Terminal 1 :
+
+noetic # Sourcer /opt/ros/noetic/setup.bash
+# Lancer un noeud ros1 (ex : Publisher)
+
+Terminal 2 :
+cd ~/bridge_ws
+colcon build --symlink-install --packages-skip ros1_bridge # D'abord tout build sans le package ros1_bridge
+bridge # Sourcer /opt/ros/noetic/setup.bash & /opt/ros/foxy/setup.bash
+colcon build --packages-select ros1_bridge --cmake-force-configure
+source install/setup.bash
+export ROS_MASTER_URI=http://adrien-Modern-15-A5M:11311/ # //roscore
+ros2 run ros1_bridge dynamic_bridge
+
+Terminal 3:
+
+foxy # Sourcer /opt/ros/foxy/setup.bash
+# Lancer un noeud ros2 (ex : Suscriber au topic ros1) / ros2 topic echo </topic/ros1> </type/topic/ros1>
+
+=> Fonctionne avec les messages standards, pour les autres : créer dans les ws ros1 et ros2 les messages customs et sourcer le install/setup.bahs de ces derniers dans le terminal 2
+
+
+
+Problème de topic trouvé mais echo dysfonctionnel entre 2 containers : 
+"
+The problem is due to the SHM (SharedMemory) transport. When you launch a Docker with --net=host and --ipc=host configuration, the publisher and subscriber detect that they are on the same host and try to use SHM. This is due to how the calculation of SHM usage was done until now. In addition, SHM uses the /dev/shm directory, which in this case is being attempted to be shared by users who have different permissions: root in the case of Docker and $USER` in the case of the host. This causes communication to fail.
+
+To fix this you have several quick solutions:
+
+    Have the same user on Docker as on the host.
+    Launch the ROS 2 application as root (equivalent to the above but without changing the Docker configuration).
+    Use UDP instead of SHM. This is as simple as running the following before launching the ROS 2 application in the Docker.
+    export FASTDDS_BUILTIN_TRANSPORTS=UDPv4 (Solution employée) 
+    Do not set --ipc=host --net=host when running the Docker container.
+"
+Résumé : export FASTDDS_BUILTIN_TRANSPORTS=UDPv4 avant de lancer les nodes
+
+
+Pour le problème de ros2 node list vide avec foxy : 
+ros2 node list --no-daemon 
+/ 
+ros2 daemon stop 
+ros2 daemon start 
+=> fonctionne voir (https://github.com/ros2/ros2cli/issues/582)

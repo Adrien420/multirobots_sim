@@ -1,0 +1,236 @@
+<=====UTILISATUER/GROUPES/DROITS=====>
+
+- Connaître son nom d'utilisateur :
+
+whoami / echo $USER
+
+- Connaître les groupes auxquels on appartient :
+
+groups / groups <username> (pour un autre utilisateur)
+
+- Ajouter un utilisateur à un groupe :
+
+sudo usermod -aG docker <username>
+
+- Voir à qui appartient un dossier et quels sont ses droits dessus :
+
+ls -ld .
+
+- Changer le propriétaire d'un dossier :
+
+sudo chown -R $USER:$USER <path_to_directory>
+
+- Version d'ubuntu :
+
+lsb_release -a
+
+<======PROCESSUS ET FICHIERS=====>
+
+- Gestionnaire des tâches (% de CPU / Mémoire / ... utilisé par chaque process) :
+
+htop (sudo apt install htop)
+
+- Vérifier les instances d'une appli en cours d'exécution :
+
+ps aux | grep <name>  (ex : ps aux | grep gz pour gazebo)
+
+- Fermer une fenêtre invisible qui bloque les clics :
+
+xkill (Puis clicker sur la zone morte)
+
+- Connaître le volume pris par un dossier/fichier :
+
+du -sh /path/to/directory
+
+- Comparer les différences entre 2 dossiers / fichiers :
+
+diff -qr <path_to_folder1> <path_to_folder2> (-q permet de montrer uniquement les fichiers qui diffèrent, et -r permet de faire cela récursivement => affiche cahque combinaison de fichier qui diffère)
+diff <path_to_file1> <path_to_file2> (affiche chaque ligne qui diffère)
+
+- Synchroniser des dossiers / fichiers :
+
+rsync -a <source> <destination> (-a est le mode "archives", permettant la copie récursive et la préservation des liens symboliques, des permissions, des appartenances (utilisateur et groupe), ainsi que de la date de création) => ne supprime pas ce qui est présent dans <destination> et non <source> par défaut, modifie uniquement les fichiers de même nom qui diffèrent, et ne pas oublier le / de fin pour les dossiers, sinon ajoute juste le <source> comme sous-dossier du <destination>
+
+- Chercher un str d'un fichier :
+
+grep -r <str> <path/to/search> (ex : grep -r "get_all_message_mappings_ros_to_gz" src/ros_gz/ros_gz_bridge/src/)
+
+- Créer un fichier de swap (temporaire, ne va pas rester actif après) :
+
+sudo fallocate -l 4G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+
+- Voir les fichiers de swap utilisés :
+
+sudo swapon --show
+
+- Enlever un fichier de swap :
+
+# Le désactiver (! important pour éviter de corrompre quoi que ce soit)
+sudo swapoff /swapfile
+# Le supprimer
+sudo rm /swapfile
+
+<=====PACKAGES=====>
+
+- Regarder de quel pkg provient un exécutable :
+
+dpkg -S $(which <executable>)
+
+- Regarder quels pkgs dépendent d'un autre :
+
+apt-cache rdepends <pkg>
+
+<=====GITHUB======>
+
+- Changer de branche :
+
+git switch <branch>
+git switch -c <branch> # Si la branche n'existe pas encore 
+
+- Initialiser un repository (après l'avoir créé en ligne) :
+
+=> Initialiser le dossier local comme dépôt git :
+
+git init
+
+=> Ajouter tous les fichiers :
+
+git add .
+
+- Désindexer un fichier (pour qu'il ne soit pas commit) :
+
+git restore --staged <file>
+
+- Vérifier les commits prêts à être push :
+
+git log <remote>/<branch>..HEAD (ex : git log origin/dev-sensors..HEAD)
+
+- Revert un changement de fichier qui a été push :
+
+git checkout HEAD~1 -- /path/to/file
+Puis commit & push
+
+- Vérifier la branche du clone + si à jour :
+
+git status
+
+- Vérifier le tag associé au commit actuel (s'il y en a un) :
+
+git describe --tags
+
+- Changer de tag :
+
+git checkout tags/<tag> (ex: git checkout tags/v2.4.2)
+
+- Vérifier remotes définis :
+
+git remote -v
+
+- Changer l'url d'une remote :
+
+git remote set-url <remote> <url> (ex : git remote set-url origin https://github.com/user/repo.git)
+
+- Récupérer les branches du remote :
+
+git fetch <remote> (ex: git fetch origin)
+
+- Lier la branche locale avec la branche distante :
+
+git push --set-upstream origin master
+
+- Vérifier que la branche locale est bien liée avec la branche distante :
+
+git branch -vv
+
+- Revenir en arrière sur un commit :
+
+git reset <commit> (permet de revenir en arrière sur un commit, le supprime de l'historique => bien dans le cas où ça n'a pas encore été push)
+Paramètres :
+--soft : commit annulé, changements sont conservés en staging (git status les montre comme prêts à commit)
+--mixed : commit annulé, changements sont conservés mais non indexés (il faut refaire git add)
+--hard : commit et changements annulés
+ex : git reset --mixed HEAD~1
+OU
+git revert <commit> (crée un nouveau commit inverse de celui à annuler, inversant ses effets, et ne modifie donc pas l'historique => mieux si déjà push / collaboratif)
+
+- Récupérer les dernières modifs push :
+
+git pull
+git pull --recurse-submodules # Si contient des submodules
+
+- Cloner un dépôt contenant des submodules (= autres dépôts, par ex si je git clone un dépôt dans mon projet) :
+
+git clone <url_repository>
+git submodule init
+git submodule update
+
+OU
+
+git clone --recurse-submodules <url_repository>
+
+<=====PYTHON=====> 
+
+- Lister les modules python installés :
+
+pip list
+
+- Infos sur module python :
+
+pip show <module_pyhton>
+
+- Installer un module python avec une version spécifique (pour downgrade par exemple) :
+
+pip install <module_pyhton>==<version> (ex : pip install setuptools==68)
+
+<=====ROS2=====>
+
+- Echo un champ d'un topic :
+
+ros2 topic echo <topic> --field <champ>
+
+<=====URDF/XACRO=====>
+
+- Installer xacro : 
+
+sudo apt install ros-humble-xacro
+
+- Convertir un fichier .urdf.xacro en .urdf :
+
+ros2 run xacro xacro <file>.urdf.xacro > <file>.urdf
+
+<=====GAZEBO=====>
+
+- Vérifier les contrôleurs actifs :
+
+ros2 control list_controllers
+
+<=====COMPILATEURS(NINJA)=====>
+
+- Voir les cibles disponibles avec ninja :
+
+ninja -t targets (dans le dossier contenant le build.ninja)
+
+<======GESTION CHALEUR & VENTILATEURS=====>
+
+?
+sudo apt install tlp
+sudo systemctl enable tlp
+sudo systemctl start tlp
+?
+
+- Infos sur la température : 
+
+sensors
+
+- Infos sur la fréquence du CPU :
+
+cpufreq-info (installé avec sudo apt install cpufrequtils)
+
+- Limiter fréquence maximale du CPU :
+
+sudo cpupower-gui (installé avec sudo apt install cpupower-gui)
+OU
+sudo cpupower frequency-set -u 2.0GHz (CLI (Command Line Interface), installé avec sudo apt install linux-tools-$(uname -r) linux-tools-common)
