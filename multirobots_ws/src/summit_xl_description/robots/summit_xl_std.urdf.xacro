@@ -86,10 +86,6 @@
 			</xacro:omni_wheel>
 		</xacro:if>
 
-	  <!-- RGBD >
-	  <xacro:sensor_orbbec_astra prefix="$(arg prefix)front_rgbd_camera" parent="$(arg prefix)base_link" prefix_topic="front_rgbd_camera">
-			<origin xyz="0.324 0.012 0.172" rpy="0 0 0"/>
-		</xacro:sensor_orbbec_astra-->
 		<!-- IMU -->
 		<xacro:sensor_pixhawk id="$(arg id)" frame_prefix="$(arg prefix)imu_" name_prefix="$(arg prefix)" parent="$(arg prefix)base_link">
 			<origin xyz="-0.18 0.0 0.170" rpy="0 0 0"/>
@@ -104,8 +100,14 @@
 		</xacro:sensor_gps>
 		<!-- ptz camera -->
 		<xacro:sensor_axis_m5013 id="$(arg id)" frame_prefix="$(arg prefix)camera_" name_prefix="$(arg prefix)" parent="$(arg prefix)base_link">
-			<origin xyz="0.185 0 0.1967" rpy="0 ${15*PI/180} 0"/>
+			<!-- <origin xyz="0.185 0 0.1967" rpy="0 ${15*PI/180} 0"/> -->
+			<origin xyz="0.185 0 0.23" rpy="0 ${-75*PI/180} 0"/>
 		</xacro:sensor_axis_m5013>
+		<!-- depth camera -->
+		<xacro:sensor_azure_kinect id="$(arg id)" frame_prefix="$(arg prefix)depth_camera_" name_prefix="$(arg prefix)" parent="$(arg prefix)base_link">
+			<!-- <origin xyz="0.324 0.012 0.172" rpy="0 0 ${PI/2}"/> -->
+			<origin xyz="0.324 0.012 0.172" rpy="0 0 ${PI/2}"/>
+		</xacro:sensor_azure_kinect>
 
    </xacro:macro>
 

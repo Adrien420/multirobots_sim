@@ -13,6 +13,10 @@ https://robotics.stackexchange.com/questions/30853/rotation-error-in-gazebo-simu
 https://robotics.stackexchange.com/questions/25211/how-to-set-fdir1-mu1-and-mu2-in-the-gazebo-tag-inside-a-urdf-file
 https://answers.ros.org/question/355364/
 
+- Rosbag : 
+
+https://github.com/ros2/rosbag2/issues/696
+
 (- Nav :
 
 https://docs.nav2.org/setup_guides/sensors/mapping_localization.html

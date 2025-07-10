@@ -53,6 +53,7 @@ def launch_setup(context):
     robot_desc = patch_nested_model(robot_desc, "x500_base")
     robot_desc = patch_nested_model(robot_desc, "lidar_2d_v2")
     robot_desc = patch_nested_model(robot_desc, "mono_cam")
+    robot_desc = patch_nested_model(robot_desc, "OakD-Lite")
 
     robot_state_publisher_node = Node(
         package="robot_state_publisher",
@@ -67,11 +68,14 @@ def launch_setup(context):
         executable='parameter_bridge',
         name='gz_bridge',
         arguments=[
-            #'clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock',
             f'world/forest/model/x500_{drone_id}/link/link/sensor/lidar_2d_v2/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
             f'/world/forest/model/x500_{drone_id}/link/camera_link/sensor/imager/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
             f'/world/forest/model/x500_{drone_id}/link/camera_link/sensor/imager/image@sensor_msgs/msg/Image[gz.msgs.Image',
-
+            f'/world/forest/model/x500_{drone_id}/link/depth_camera_link/sensor/IMX214/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
+            f'/world/forest/model/x500_{drone_id}/link/depth_camera_link/sensor/IMX214/image@sensor_msgs/msg/Image[gz.msgs.Image',
+            f'/world/forest/model/x500_{drone_id}/link/depth_camera_link/sensor/StereoOV7251/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
+            f'/world/forest/model/x500_{drone_id}/link/depth_camera_link/sensor/StereoOV7251/depth_image@sensor_msgs/msg/Image[gz.msgs.Image',
+            f'/world/forest/model/x500_{drone_id}/link/depth_camera_link/sensor/StereoOV7251/depth_image/points@sensor_msgs/msg/PointCloud2[gz.msgs.PointCloudPacked',
             '--ros-args', '--log-level', 'info'
         ],
         parameters=[{"use_sim_time": True}],
