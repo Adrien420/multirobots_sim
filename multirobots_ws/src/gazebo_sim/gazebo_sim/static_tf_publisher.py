@@ -21,14 +21,34 @@ class StaticTfPublisher(Node):
             depth=1
         )
 
+        self.declare_parameter('nb_drones', 0)
+
         self.broadcaster = StaticTransformBroadcaster(self)
+
+        # Create static tf between world and summit's base frame, without any translation or rotation
+        self.static_tf_summit = TransformStamped()
+        self.static_tf_summit.header.stamp = self.get_clock().now().to_msg()
+        self.static_tf_summit.header.frame_id = 'world'
+        self.static_tf_summit.child_frame_id = 'summit_xl_1/summit_xl_odom'
+
+        self.static_tf_summit.transform.translation.x = 0.0
+        self.static_tf_summit.transform.translation.y = 1.0
+        self.static_tf_summit.transform.translation.z = 0.0
+
+        self.static_tf_summit.transform.rotation.x = 0.0
+        self.static_tf_summit.transform.rotation.y = 0.0
+        self.static_tf_summit.transform.rotation.z = 0.0
+        self.static_tf_summit.transform.rotation.w = 1.0
         
-        self.subscription = self.create_subscription(
-            VehicleOdometry,
-            '/px4_1/fmu/out/vehicle_odometry',
-            self.handle_odom,
-            qos_profile
-        )
+        if self.get_parameter('nb_drones').value > 0:
+            self.subscription = self.create_subscription(
+                VehicleOdometry,
+                '/px4_1/fmu/out/vehicle_odometry',
+                self.handle_odom,
+                qos_profile
+            )
+        else:
+            self.broadcaster.sendTransform(self.static_tf_summit)
         
     def handle_odom(self, msg):
         self.tf_px4 = TransformStamped()
@@ -46,22 +66,7 @@ class StaticTfPublisher(Node):
         self.tf_px4.transform.rotation.z = float(q_rviz[2])
         self.tf_px4.transform.rotation.w = float(q_rviz[3])
         
-        # Create static tf between world and summit's base frame, without any translation or rotation
-        self.static_tf_summit = TransformStamped()
-        self.static_tf_summit.header.stamp = self.get_clock().now().to_msg()
-        self.static_tf_summit.header.frame_id = 'world'
-        self.static_tf_summit.child_frame_id = 'summit_xl_1/summit_xl_odom'
-
-        self.static_tf_summit.transform.translation.x = 0.0
-        self.static_tf_summit.transform.translation.y = 1.0
-        self.static_tf_summit.transform.translation.z = 0.0
-
-        self.static_tf_summit.transform.rotation.x = 0.0
-        self.static_tf_summit.transform.rotation.y = 0.0
-        self.static_tf_summit.transform.rotation.z = 0.0
-        self.static_tf_summit.transform.rotation.w = 1.0
-        
-        # Envoyer la transform statique
+        # Envoyer les tfs
         self.broadcaster.sendTransform([self.static_tf_summit, self.tf_px4])
 
 def main():

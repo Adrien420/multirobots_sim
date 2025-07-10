@@ -94,7 +94,7 @@ def launch_setup(context):
         package='gazebo_sim',
         executable='static_tf_publisher',
         output='screen',
-        parameters=[{"use_sim_time": True}],
+        parameters=[{"use_sim_time": True, "nb_drones":nb_drones}],
     )
     
     microXRCEagent_cmd = ExecuteProcess(

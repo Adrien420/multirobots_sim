@@ -23,7 +23,7 @@ def launch_setup(context):
     rosbag_play = ExecuteProcess(
         cmd=[
             'ros2', 'bag', 'play', rosbag_save_dir,
-            '--clock'
+            #'--clock'
         ],
         output='screen'
     )
