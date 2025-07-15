@@ -5,7 +5,7 @@ ARG USERNAME=multirobots
 ARG USER_UID=1000
 ARG USER_GID=$USER_UID
 
-# Workaround for the expired GPG key
+# Workaround for the expired GPG key (not needed anymore, but I let it there just in case)
 #RUN rm /etc/apt/sources.list.d/ros2-latest.list \
 #  && rm /usr/share/keyrings/ros2-latest-archive-keyring.gpg
 
@@ -18,7 +18,7 @@ ARG USER_GID=$USER_UID
  #   && apt-get install /tmp/ros2-apt-source.deb \
  #   && rm -f /tmp/ros2-apt-source.deb
 
-# Install dependencies and tools
+# Install tools
 RUN apt-get update && apt-get install -y --fix-missing \
     git wget curl python3-pip nano net-tools terminator
 
@@ -52,18 +52,6 @@ RUN apt-get update && \
     cd PX4-Autopilot && \
     bash Tools/setup/ubuntu.sh && \
     cd .. && rm -rf PX4-Autopilot
-    
-# Micro-XRCE-DDS-Agent compilation
-#COPY multirobots_ws/src/Micro-XRCE-DDS-Agent /home/$USERNAME/multirobots_ws/src/Micro-XRCE-DDS-Agent
-#WORKDIR /home/$USERNAME/multirobots_ws/src
-#RUN apt-get update && \
-#    cd Micro-XRCE-DDS-Agent && \
-#    mkdir -p build && \
-#    cd build && \
-#    cmake .. && \
-#    make && \
-#    sudo make install && \
-#    sudo ldconfig
     
 # ros_gz_sim & gz_ros2_contol dependencies
 

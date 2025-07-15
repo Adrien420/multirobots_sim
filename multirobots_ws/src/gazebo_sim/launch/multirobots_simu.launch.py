@@ -157,6 +157,13 @@ def launch_setup(context):
         ),
     )
 
+    event_handler_rviz_cmd = RegisterEventHandler(
+        OnProcessExit(
+            target_action=wait_px4_ready_cmd,
+            on_exit=[rviz]
+        ),
+    )
+
     shutdown_handler = RegisterEventHandler(
         OnShutdown(
             on_shutdown=on_shutdown
@@ -167,7 +174,8 @@ def launch_setup(context):
 
     # Simulation
     simu_cmds.append(gazebo)
-    simu_cmds.append(rviz)
+    #simu_cmds.append(rviz)
+    simu_cmds.append(event_handler_rviz_cmd)
     simu_cmds.append(gz_bridge)
     simu_cmds.append(rosbag)
     simu_cmds.append(static_tf_publisher)
