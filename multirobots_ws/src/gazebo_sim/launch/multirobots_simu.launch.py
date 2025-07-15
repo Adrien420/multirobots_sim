@@ -1,15 +1,19 @@
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, ExecuteProcess, SetEnvironmentVariable, DeclareLaunchArgument, RegisterEventHandler, OpaqueFunction
+from launch.actions import IncludeLaunchDescription, ExecuteProcess, SetEnvironmentVariable, DeclareLaunchArgument, RegisterEventHandler, OpaqueFunction, LogInfo
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import PathJoinSubstitution, LaunchConfiguration, PythonExpression
 from launch_ros.substitutions import FindPackageShare
 from launch.conditions import IfCondition
 from launch_ros.actions import Node
-from launch.event_handlers import OnProcessExit
+from launch.event_handlers import OnProcessExit, OnShutdown
 
-import os, datetime
+import os, datetime, subprocess
 from ament_index_python import get_package_share_directory, get_package_prefix
 # Attention : get_package_share_directory renvoit le chemin /.../share/pkg_name et non /.../share
+
+def on_shutdown(event, context):
+    subprocess.run(["pkill", "-9", "QGroundControl"])
+    return
 
 def launch_setup(context):
     
@@ -110,7 +114,7 @@ def launch_setup(context):
         cmd=[
             './squashfs-root/AppRun > /dev/null 2>&1'
         ],
-        cwd = '/home/multirobots/multirobots_ws/src/QGroundControl.AppImage',
+        cwd = '/home/multirobots/multirobots_ws/src/QGroundControl',
         condition=IfCondition(PythonExpression(['"', LaunchConfiguration('nb_drones'), '" != "0"'])),
         shell=True
     )
@@ -153,6 +157,12 @@ def launch_setup(context):
         ),
     )
 
+    shutdown_handler = RegisterEventHandler(
+        OnShutdown(
+            on_shutdown=on_shutdown
+        )
+    )
+
     simu_cmds = []
 
     # Simulation
@@ -165,6 +175,7 @@ def launch_setup(context):
     # PX4
     simu_cmds.append(microXRCEagent_cmd)
     simu_cmds.append(QGroundControl_cmd)
+    simu_cmds.append(shutdown_handler)
     simu_cmds.append(px4_spawner_cmd)
 
     # Summit
