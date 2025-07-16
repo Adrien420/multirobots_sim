@@ -119,10 +119,10 @@
         </link>
       </model>
       <model name='pine_tree_clone_10'>
-        <pose>-2 11 0 0 0 0</pose>
+        <pose>-2 11 0.98 0 0 0</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose>-2 11 0 0 0 0</pose>
+          <pose>-2 11 0.98 0 0 0</pose>
           <velocity>0 0 0 0 0 0</velocity>
           <acceleration>0 0 0 0 0 0</acceleration>
           <wrench>0 0 0 0 0 0</wrench>
@@ -289,10 +289,10 @@
         </link>
       </model>
       <model name='terrain'>
-        <pose>0 0 0.070000000000000007 0 0 0</pose>
+        <pose>0 0 0 0 0 0</pose>
         <scale>1 1 1</scale>
         <link name='terrain_link'>
-          <pose>0 0 0.070000000000000007 0 0 0</pose>
+          <pose>0 0 0 0 0 0</pose>
           <velocity>0 0 0 0 0 0</velocity>
           <acceleration>0 0 0 0 0 0</acceleration>
           <wrench>0 0 0 0 0 0</wrench>
@@ -389,11 +389,11 @@
           </inertia>
         </inertial>
         <collision name='terrain_link_collision'>
-          <pose>0 0 0 0 0 0</pose>
+          <pose>0 0 1 0 0 0</pose>
           <geometry>
             <mesh>
-              <scale>8 8 1</scale>
-              <uri>model://gazebo_sim/urdf/meshes/terrain3.dae</uri>
+              <scale>1 1 1</scale>
+              <uri>model://gazebo_sim/urdf/meshes/terrain2.dae</uri>
             </mesh>
           </geometry>
           <max_contacts>10</max_contacts>
@@ -415,11 +415,11 @@
           </surface>
         </collision>
         <visual name='terrain_link_visual'>
-          <pose>0 0 0 0 0 0</pose>
+          <pose>0 0 1 0 0 0</pose>
           <geometry>
             <mesh>
-              <scale>8 8 1</scale>
-              <uri>model://gazebo_sim/urdf/meshes/terrain3.dae</uri>
+              <scale>1 1 1</scale>
+              <uri>model://gazebo_sim/urdf/meshes/terrain2.dae</uri>
             </mesh>
           </geometry>
         </visual>
@@ -1485,7 +1485,7 @@
           </inertia>
         </inertial>
       </link>
-      <pose>-2 11 0 0 0 0</pose>
+      <pose>-2 11 0.98 0 0 0</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='pine_tree_clone_11'>
@@ -1728,7 +1728,7 @@
           </inertia>
         </inertial>
       </link>
-      <pose>6.9186699999999997 11.8431 0 0 0 0</pose>
+      <pose>6.9186699999999997 11.8431 0.74 0 0 0</pose>
       <self_collide>false</self_collide>
     </model>
     <model name='pine_tree_clone_14'>
@@ -2144,7 +2144,7 @@
       <diffuse>0.5 0.5 0.5 1</diffuse>
       <specular>0.5 0.5 0.5 1</specular>
       <attenuation>
-        <range>40</range>
+        <range>100</range>
         <linear>0.10000000000000001</linear>
         <constant>0.20000000000000001</constant>
         <quadratic>0.01</quadratic>

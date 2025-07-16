@@ -147,7 +147,7 @@ def generate_launch_description():
     return LaunchDescription([
         DeclareLaunchArgument('x_pose', default_value='0.0'),
         DeclareLaunchArgument('y_pose', default_value='1.0'),
-        DeclareLaunchArgument('z_pose', default_value='1.0'),
+        DeclareLaunchArgument('z_pose', default_value='2.0'),
         DeclareLaunchArgument('summit_id', default_value='1'),
         OpaqueFunction(function=launch_setup)
     ])
