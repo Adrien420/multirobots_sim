@@ -31,8 +31,11 @@ Then restart the system to apply the group changes.
 ```
 cd ~/
 git clone --recursive https://github.com/Adrien420/multirobots_sim.git
-cd multirobots_sim/
-git switch dev-sensors # Tmp
+
+# Install Git LFS to pull large files
+cd ~/multirobots_sim/
+sudo apt-get install git-lfs
+git lfs pull
 ```
 - **Setup the repository &nbsp;:**
 
@@ -48,7 +51,41 @@ git submodule update --init --recursive
 ### -&nbsp; Build the docker image &nbsp;:
 	
 ```	
+cd ~/multirobots_sim/
 docker build -f Docker/Dockerfile --tag cristal-container .
+```
+
+### -&nbsp; (Optional) Configuration to use GPU acceleration in Docker with NVIDIA GPUs (cf [nvidia_doc](https://docs.nvidia.com/ai-enterprise/deployment/vmware/latest/docker.html)) &nbsp;:
+
+- **Installation &nbsp;:**
+
+```
+# Configure the production repository
+curl -fsSL https://nvidia.github.io/libnvidia-container/gpgkey | sudo gpg --dearmor -o /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg \
+  && curl -s -L https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list | \
+    sed 's#deb https://#deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://#g' | \
+    sudo tee /etc/apt/sources.list.d/nvidia-container-toolkit.list
+
+# Update the packages list from the repository
+sudo apt-get update
+
+# Install the NVIDIA Container Toolkit packages
+export NVIDIA_CONTAINER_TOOLKIT_VERSION=1.17.8-1
+sudo apt-get install -y \
+    nvidia-container-toolkit=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
+    nvidia-container-toolkit-base=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
+    libnvidia-container-tools=${NVIDIA_CONTAINER_TOOLKIT_VERSION} \
+    libnvidia-container1=${NVIDIA_CONTAINER_TOOLKIT_VERSION}
+```
+
+- **Configuration &nbsp;:**
+
+```
+# Configure the container runtime by using the nvidia-ctk command
+sudo nvidia-ctk runtime configure --runtime=docker
+
+# Restart the Docker daemon
+sudo systemctl restart docker
 ```
 
 # Usage &nbsp;:
@@ -61,10 +98,9 @@ docker build -f Docker/Dockerfile --tag cristal-container .
 
 ### -&nbsp; Compiling the first time (or after rebuilding the docker image) &nbsp;:
 
-- **Compile the PX4's packages *(temporary instruction, since it will be implemented in the docker file in the future)* &nbsp;:**
+- **Compile the PX4-Autopilot package &nbsp;:**
 
 ```
-# PX4-Autopilot
 cd ~/multirobots_ws/src/PX4-Autopilot
 make clean
 make distclean
@@ -72,8 +108,11 @@ pip3 install kconfiglib
 pip3 install jsonschema
 pip3 install pyros-genmsg
 make px4_sitl 
+```
 
-# Micro-XRCE-DDS-Agent
+- **Compile the Micro-XRCE-DDS-Agent package &nbsp;:**
+
+```
 cd ~/multirobots_ws/src/Micro-XRCE-DDS-Agent/
 mkdir -p build
 cd build
@@ -112,6 +151,7 @@ Aftewards, compile the other packages :
 
 ```
 colcon build
+source install/setup.bash
 ```
 
 ### -&nbsp; Run the simulation &nbsp;:
@@ -119,3 +159,42 @@ colcon build
 ```
 ros2 launch gazebo_sim multirobots_simu.launch.py rviz:=true
 ```
+
+# Troubleshooting &nbsp;:
+
+### -&nbsp; Launch file not working after running a new intsance of Docker container &nbsp;:
+
+Normally, once everything has been compiled the first time, everything should work out of the box each time.
+However, in a recent installation, I found it wouldn't work when running a new container, without compiling the Micro-XRCE-DDS-Agent package again.
+
+In that case, the easiest fix for now is just to recompile it each time, with :
+
+```
+cd ~/multirobots_ws/src/Micro-XRCE-DDS-Agent/
+mkdir -p build
+cd build
+cmake ..
+make
+sudo make install
+sudo ldconfig
+
+cd ~/multirobots_ws
+colcon build
+```
+
+### -&nbsp; Launch file not working all of a sudden in the same Docker container &nbsp;:
+
+If nothing has been changed in the project, it is usually caused by a gz instance still running.
+
+To check that, use :
+
+```
+ps aux | grep gz
+```
+
+And kill any instance remaining with :
+
+```
+kill -9 <instance_id>
+```
+
