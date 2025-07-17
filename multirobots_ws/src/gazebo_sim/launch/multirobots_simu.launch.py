@@ -33,7 +33,7 @@ def launch_setup(context):
             PathJoinSubstitution([
                 FindPackageShare('gazebo_sim'),
                 'worlds',
-                'forest2.sdf '
+                'forest.sdf '
             ]),
             '-r', # Allow to start the simulation as soon as Gazebo is launched
             '2>&1 | grep -v "not defined in SDF"'
