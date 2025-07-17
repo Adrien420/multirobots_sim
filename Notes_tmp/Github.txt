@@ -14,16 +14,16 @@
 	
 1 - Forker le dépôt sur github
 
-2 - Créer un backup du dépôt cloné localement (mv PX4-Autopilot PX4-Autopilot_backup par ex)
+((Si package déjà modifié au préalable) 2 - Créer un backup du dépôt cloné localement (mv PX4-Autopilot PX4-Autopilot_backup par ex))
 
 3 - A la racine du dépôt local, ajouter le submodule avec la commande : git submodule add -b <branch> <url_fork> <submodule_path> (ex : git submodule add -b main https://github.com/Adrien420/PX4-Autopilot.git multirobots_ws/src/PX4-Autopilot)
 
-4 - Modifier le submodule (à la main, ou avec rsync -a <source> <destination>) => Attention, tout modifier change le remote pour lé dépôt d'origine et non le fork !
+((Si package déjà modifié au préalable) 4 - Modifier le submodule (à la main, ou avec rsync -a <source> <destination>) => Attention, tout modifier change le remote pour lé dépôt d'origine et non le fork !)
 
-5 - Dans le dossier du submodule, commit & push les modifs sur le fork : 
+((Si package déjà modifié au préalable) 5 - Dans le dossier du submodule, commit & push les modifs sur le fork : 
 Vérifier la branche et le remote actuels avec : git status & git remote -v
 Eventuellement : git switch <branch> 
-Puis : git add . && git commit -m "modifs" && git push <remote> <branch>
+Puis : git add . && git commit -m "modifs" && git push <remote> <branch>)
 
 6 - Ajouter et commit le submodule : git add <submodule_name> && git commit -m "Initialisation du submodule <submodule_name>"
 

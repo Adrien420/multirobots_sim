@@ -93,7 +93,13 @@ sudo systemctl restart docker
 ### -&nbsp; Run the container &nbsp;:
 
 ```
-./Docker/docker_run.sh
+./Docker/docker_run_intel.sh
+```
+
+If you are using NVIDIA GPU acceleration, run this script instead :
+
+```
+./Docker/docker_run_nvidia.sh
 ```
 
 ### -&nbsp; Compiling the first time (or after rebuilding the docker image) &nbsp;:
@@ -154,10 +160,23 @@ colcon build
 source install/setup.bash
 ```
 
-### -&nbsp; Run the simulation &nbsp;:
+### -&nbsp; Run launch files & nodes &nbsp;:
+
+- **Launch the simulation &nbsp;:**
+
+Launch arguments &nbsp;:
+
+| Argument | Type | Default Value | Usage |
+| :---: | :---: | :---: | :---: |
+| `rviz` | bool | false | Choose whether you launch Rviz or not |
+| `rosbag` | bool | false | Choose whether you register data with rosbag or not |
+| `nb_summits` | int | 1 | Choose the number of Summit XL to spawn |
+| `nb_drones` | int | 1 | Choose the number of drones to spawn |
+
+Command (example) &nbsp;:
 
 ```
-ros2 launch gazebo_sim multirobots_simu.launch.py rviz:=true
+ros2 launch gazebo_sim multirobots_simu.launch.py rviz:=true nb_drones:=3
 ```
 
 # Troubleshooting &nbsp;:
@@ -198,3 +217,7 @@ And kill any instance remaining with :
 kill -9 <instance_id>
 ```
 
+### -&nbsp; Drone not taking off despite rotors spinning &nbsp;:
+
+If you changed something in the models or in the drone's spawn position, there is a chance its legs are inside the terrain collider.
+In this case, either the drone is spawned too low, or the max_step_size (defined in gazebo_sim/worlds/forest.sdf) is too high and the collision isn't detected soon enough. Of course, don't lower the max_step_size too much, since it will make the simulation much slower.
