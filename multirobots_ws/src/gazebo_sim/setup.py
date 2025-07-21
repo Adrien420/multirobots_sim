@@ -34,6 +34,7 @@ setup(
         'console_scripts': [
             'px4_teleop = gazebo_sim.px4_teleop:main',
             'summit_teleop = gazebo_sim.summit_teleop:main',
+            'ranger_mini_teleop = gazebo_sim.ranger_mini_teleop:main',
             'static_tf_publisher = gazebo_sim.static_tf_publisher:main',
             'summit_follow_path = gazebo_sim.summit_follow_path:main',
             'px4_follow_path = gazebo_sim.px4_follow_path:main',
