@@ -47,7 +47,7 @@ def launch_setup(context):
         output='screen',
         arguments=['-d', os.path.join(get_package_share_directory('gazebo_sim'), 'rviz', 'summit_xl_1.rviz')],
         parameters=[{"use_sim_time": True}],
-        condition=IfCondition(use_rviz)
+        condition=IfCondition(PythonExpression([use_rviz, ' and "', LaunchConfiguration('nb_drones'), '" == "0"']))
     )
     
     gz_bridge = Node(
@@ -157,10 +157,19 @@ def launch_setup(context):
         ),
     )
 
+    delayed_rviz_cmd = Node(
+        package='rviz2',
+        executable='rviz2',
+        output='screen',
+        arguments=['-d', os.path.join(get_package_share_directory('gazebo_sim'), 'rviz', 'summit_xl_1.rviz')],
+        parameters=[{"use_sim_time": True}],
+        condition=IfCondition(PythonExpression([use_rviz, ' and "', LaunchConfiguration('nb_drones'), '" != "0"']))
+    )
+
     event_handler_rviz_cmd = RegisterEventHandler(
         OnProcessExit(
             target_action=wait_px4_ready_cmd,
-            on_exit=[rviz]
+            on_exit=[delayed_rviz_cmd]
         ),
     )
 
@@ -174,7 +183,7 @@ def launch_setup(context):
 
     # Simulation
     simu_cmds.append(gazebo)
-    #simu_cmds.append(rviz)
+    simu_cmds.append(rviz)
     simu_cmds.append(event_handler_rviz_cmd)
     simu_cmds.append(gz_bridge)
     simu_cmds.append(rosbag)

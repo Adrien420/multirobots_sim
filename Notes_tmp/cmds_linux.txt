@@ -30,6 +30,8 @@ lsb_release -a
 
 htop (sudo apt install htop)
 
+=> Pour le GPU : nvtop (sudo apt install nvtop)
+
 - Vérifier les instances d'une appli en cours d'exécution :
 
 ps aux | grep <name>  (ex : ps aux | grep gz pour gazebo)
