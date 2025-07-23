@@ -93,7 +93,7 @@ def launch_setup(context):
             'PX4_SIM_MODEL': 'gz_x500',
             'PX4_GZ_MODEL_POSE': [
                 str(x_pose),
-                TextSubstitution(text=',0,1,0,0,0')
+                TextSubstitution(text=',1,1.5,0,0,0')
             ],
             'PX4_GZ_WORLD': 'forest',
             'PATH': os.environ.get('PATH', '') + ':/home/multirobots/multirobots_ws/src/PX4-Autopilot/build/px4_sitl_default/bin',

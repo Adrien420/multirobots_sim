@@ -138,12 +138,12 @@ class Px4Teleop(Node) :
         
         key = self.get_key()
         # Movements
-        # Translation according to x (forward/backward)
+        # Translation according to y (left/right)
         if key == 'q':
             msg.velocity[0] = 1.0 
         elif key == 'd':
             msg.velocity[0] = -1.0
-        # Translation according to y (left/right)
+        # Translation according to x (forward/backward)
         elif key == 'z':
             msg.velocity[1] = 1.0
         elif key == 's':

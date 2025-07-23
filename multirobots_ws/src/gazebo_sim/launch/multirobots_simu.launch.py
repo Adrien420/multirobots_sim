@@ -1,15 +1,19 @@
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription, ExecuteProcess, SetEnvironmentVariable, DeclareLaunchArgument, RegisterEventHandler, OpaqueFunction
+from launch.actions import IncludeLaunchDescription, ExecuteProcess, SetEnvironmentVariable, DeclareLaunchArgument, RegisterEventHandler, OpaqueFunction, LogInfo
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.substitutions import PathJoinSubstitution, LaunchConfiguration, PythonExpression
 from launch_ros.substitutions import FindPackageShare
 from launch.conditions import IfCondition
 from launch_ros.actions import Node
-from launch.event_handlers import OnProcessExit
+from launch.event_handlers import OnProcessExit, OnShutdown
 
-import os, datetime
+import os, datetime, subprocess
 from ament_index_python import get_package_share_directory, get_package_prefix
 # Attention : get_package_share_directory renvoit le chemin /.../share/pkg_name et non /.../share
+
+def on_shutdown(event, context):
+    subprocess.run(["pkill", "-9", "QGroundControl"])
+    return
 
 def launch_setup(context):
     
@@ -17,6 +21,7 @@ def launch_setup(context):
     use_rviz = LaunchConfiguration('rviz')
     use_rosbag = LaunchConfiguration('rosbag')
     nb_summits = int(LaunchConfiguration('nb_summits').perform(context))
+    nb_rangers = int(LaunchConfiguration('nb_rangers').perform(context))
     nb_drones = int(LaunchConfiguration('nb_drones').perform(context))
 
     now = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -29,7 +34,7 @@ def launch_setup(context):
             PathJoinSubstitution([
                 FindPackageShare('gazebo_sim'),
                 'worlds',
-                'forest2.sdf '
+                'forest.sdf '
             ]),
             '-r', # Allow to start the simulation as soon as Gazebo is launched
             '2>&1 | grep -v "not defined in SDF"'
@@ -43,7 +48,7 @@ def launch_setup(context):
         output='screen',
         arguments=['-d', os.path.join(get_package_share_directory('gazebo_sim'), 'rviz', 'summit_xl_1.rviz')],
         parameters=[{"use_sim_time": True}],
-        condition=IfCondition(use_rviz)
+        condition=IfCondition(PythonExpression([use_rviz, ' and "', LaunchConfiguration('nb_drones'), '" == "0"']))
     )
     
     gz_bridge = Node(
@@ -90,9 +95,9 @@ def launch_setup(context):
         output='screen'
     )
 
-    static_tf_publisher = Node(
+    tf_publisher = Node(
         package='gazebo_sim',
-        executable='static_tf_publisher',
+        executable='tf_publisher',
         output='screen',
         parameters=[{"use_sim_time": True, "nb_drones":nb_drones}],
     )
@@ -110,7 +115,7 @@ def launch_setup(context):
         cmd=[
             './squashfs-root/AppRun > /dev/null 2>&1'
         ],
-        cwd = '/home/multirobots/multirobots_ws/src/QGroundControl.AppImage',
+        cwd = '/home/multirobots/multirobots_ws/src/QGroundControl',
         condition=IfCondition(PythonExpression(['"', LaunchConfiguration('nb_drones'), '" != "0"'])),
         shell=True
     )
@@ -153,24 +158,90 @@ def launch_setup(context):
         ),
     )
 
+    delayed_rviz_cmd = Node(
+        package='rviz2',
+        executable='rviz2',
+        output='screen',
+        arguments=['-d', os.path.join(get_package_share_directory('gazebo_sim'), 'rviz', 'summit_xl_1.rviz')],
+        parameters=[{"use_sim_time": True}],
+        condition=IfCondition(PythonExpression([use_rviz, ' and "', LaunchConfiguration('nb_drones'), '" != "0"']))
+    )
+
+    event_handler_rviz_cmd = RegisterEventHandler(
+        OnProcessExit(
+            target_action=wait_px4_ready_cmd,
+            on_exit=[delayed_rviz_cmd]
+        ),
+    )
+
+    robot_to_wait = ""
+    if nb_summits > 0:
+        robot_to_wait = "summit"
+    else:
+        robot_to_wait = "drone"
+
+    ranger_mini_spawner_cmd = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('gazebo_sim'), 'launch', 'multiple_spawn_ranger_mini.launch.py')
+        ),
+        launch_arguments={'nb_rangers':str(nb_rangers)}.items(),
+        condition=IfCondition(PythonExpression(['"', LaunchConfiguration(f'nb_{robot_to_wait}s'), '" == "0"'])),
+    )
+
+    wait_ready_cmd = Node(
+        package='gazebo_sim',
+        executable='wait_topic_creation',
+        parameters=[{"use_sim_time": True, "robot_type":f"{robot_to_wait}", "summit_id":nb_summits}],
+        output='screen',
+        condition=IfCondition(PythonExpression(['"', LaunchConfiguration(f'nb_{robot_to_wait}s'), '" != "0"'])),
+    )
+
+    delayed_ranger_mini_spawner_cmd = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(get_package_share_directory('gazebo_sim'), 'launch', 'multiple_spawn_ranger_mini.launch.py')
+        ),
+        launch_arguments={'nb_rangers':str(nb_rangers)}.items(),
+        condition=IfCondition(PythonExpression(['"', LaunchConfiguration(f'nb_{robot_to_wait}s'), '" != "0"'])),
+    )
+
+    event_handler_ranger_mini_spawner_cmd = RegisterEventHandler(
+        OnProcessExit(
+            target_action=wait_ready_cmd,
+            on_exit=[delayed_ranger_mini_spawner_cmd]
+        ),
+    )
+
+    shutdown_handler = RegisterEventHandler(
+        OnShutdown(
+            on_shutdown=on_shutdown
+        )
+    )
+
     simu_cmds = []
 
     # Simulation
     simu_cmds.append(gazebo)
     simu_cmds.append(rviz)
+    simu_cmds.append(event_handler_rviz_cmd)
     simu_cmds.append(gz_bridge)
     simu_cmds.append(rosbag)
-    simu_cmds.append(static_tf_publisher)
+    simu_cmds.append(tf_publisher)
 
     # PX4
     simu_cmds.append(microXRCEagent_cmd)
     simu_cmds.append(QGroundControl_cmd)
+    simu_cmds.append(shutdown_handler)
     simu_cmds.append(px4_spawner_cmd)
 
     # Summit
     simu_cmds.append(summit_spawner_cmd)
     simu_cmds.append(wait_px4_ready_cmd)
     simu_cmds.append(event_handler_summit_spawner_cmd)
+
+    # Ranger Mini
+    simu_cmds.append(ranger_mini_spawner_cmd)
+    simu_cmds.append(wait_ready_cmd)
+    simu_cmds.append(event_handler_ranger_mini_spawner_cmd)
 
     return simu_cmds
 
@@ -193,9 +264,10 @@ def generate_launch_description():
         SetEnvironmentVariable("GZ_SIM_RESOURCE_PATH", resource_path),
         SetEnvironmentVariable("GZ_SIM_SERVER_CONFIG_PATH", server_config_path),
         SetEnvironmentVariable("GZ_SIM_SYSTEM_PLUGIN_PATH", plugins_path),
-        DeclareLaunchArgument('rviz', default_value='false'),
+        DeclareLaunchArgument('rviz', default_value='False'),
         DeclareLaunchArgument('rosbag', default_value='false'),
         DeclareLaunchArgument('nb_summits', default_value='1'),
+        DeclareLaunchArgument('nb_rangers', default_value='0'),
         DeclareLaunchArgument('nb_drones', default_value='1'),
         OpaqueFunction(function=launch_setup)
     ])

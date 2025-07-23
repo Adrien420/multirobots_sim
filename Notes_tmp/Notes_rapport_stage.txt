@@ -51,7 +51,7 @@ Semaine 5 :
 - Création d'une image docker sur ubuntu 20.04 avec ros noetic et ros foxy (les 2 officiellement supportés sur cette version d'ubuntu, installables à partir des packages officiels, contrairement à humble ou noetic sur ubuntu 22.04 -> plus simple) => mais problème de versions de dépendances du package ros2/ros1_bridge, compatibles uniquement avec des versions plus récentes de ros2, malgré l'indication dans le github du package d'un full support pour foxy
 - Utilisation du branche plus ancienne (foxy) du package ros2/ros1_bridge => problème résolu
 - Pont fonctionnel pour créer des topics ros2 à partir des topics ros1 avec des types de message standards
-- Création d'un message customisé en ros2 => message bien créé et trouvé, mais pour le moment ne fonctionne pas pour créer une nouvelle "paire" (= 2 types de message ros1/ros2 pour lesquels un pont peut être créé) car testé avec un message custom ros1 provenant d'un package installé et non le workspace, dont il faut sourer le install/setup.bash pour que cela fonctionne
+- Création d'un message customisé en ros2 => message bien créé et trouvé, mais pour le moment ne fonctionne pas pour créer une nouvelle "paire" (= 2 types de message ros1/ros2 pour lesquels un pont peut être créé) car testé avec un message custom ros1 provenant d'un package installé et non le workspace, dont il faut sourcer le install/setup.bash pour que cela fonctionne
 - Communication entre 2 containers via ros (entre foxy et humble) réussie en modifiant une variable d'environnement (voir Notes_bridge.txt)
 - Pour foxy : problème de nodes/topics non trouvés d'un terminal à l'autre (problème qui n'a pas lieu avec humble -> humble / humble -> foxy, vraisemblablement un problème de dockerfile / config ros => finalement non, juste une histoire de deamon qui ne met pas bien à jour... voir Notes_bridge.txt)
 - Simulation du summit xl sur gazebo harmonic à partir des packages ros1 plus complexe qu'anticipé : package de simu du summit xl prévue pour gazebo classic, comment se servir du pont pour accéder aux fichiers urdf, aux services ?
@@ -309,3 +309,25 @@ Semaine 12 :
 - Ajout de la depth camera pour le drone px4 -> aucun topic n'était créé dans un premier temps côté gz pour le capteur de type depth_camera -> c'était causé par la présence de la balise <topic>
 - L'ajout de nouvelles caméras ralentit grandement la simulation (~30% de TF avec un seul drone)
 - Finalement le problème du type depth pour le summit est juste que le bon type est maintenant depth_camera => mais toujours le problème de remap du topic /depth/camera_info (possibilité de juste enlever le topic <topic> et de faire avec le nom complet qui contient déjà l'id, comme pour le drone, mais pour le moment juste laissé dans la version avec le type rgbd_camera)
+- Pull request merge de la branche dev-sensors et création d'une nouvelle branche clean-up pour les derniers correctifs à apporter sur la fin du stage
+- Tentative de forcer la fermeture de QGroundControl lors du shutdown (qui envoit une demande de confirmation au lieu de se fermer si au moins un robot est connecté) -> en CLI pkill -9 QGroundControl fonctionne, mais ne donne rien quand exécuté via ExecuteProcess
+=> Vraisemblablement (également constaté dans un post sur Robotics Stack Exchange), l'action ExecuteProcess dans l'event OnShutdown n'a aucun effet
+=> Workaround trouvé : appeler une fonction via on_shutdown (qui doit prendre 2 arguments pour éviter des erreurs, event et context), dans laquelle QGC est terminé via subprocess.run(["pkill", "-9", "QGroundControl"])
+
+Semaine 13 :
+
+- Installation du projet sur le PC avec GPU (correctifs et modifications du guide d'installation)
+- Pour le problème avec QGroundControl.AppImage devenant un ASCII text lors du git clone, il fait en fait utiliser git lfs pull après le clone pour récupérer les fichiers pushed avec Git LFS
+- Pour la tentative d'utiliser le GPU de Nvidia dans Docker -> toutes les configurations réalisées (cf doc de Nvidia) mais toujours GPU Intel utilisé (intégré au CPU)
+- En fait la commande nvidia-smi indique bien une utilisation du GPU Nvidia pendant la simulation (augmentation du Memory-Usage), mais RTF toujours aussi faible et GPU-Util (GPU Utilization) à 0% -> en effet aucun procces n'est indiqué comme utilisant le GPU
+=> Exporter les variables d'environnement suivantes dans le container : 
+export __NV_PRIME_RENDER_OFFLOAD=1
+export __GLX_VENDOR_LIBRARY_NAME=nvidia
+=> Cela a permis de forcer OpenGL à utiliser le GPU de Nvidia (Quadro RTX 3000/PCIe/SSE2) à la place de celui d'Intel (Mesa Intel(R) UHD Graphics 630 (CFL GT2))
+=> GPU-Util passé de 0% à 36% et RTF (pour drone + summit avec les 2 caméras, Lidar, IMU, GPS, et les quelques autres capteurs du drone, et terrain pré-modif de dimension et relief = moins de triangles dans la simu) passé de 25-30 % à 40-45% (Amélioration moins importante qu'espéré, mais présente tout de même)
+- Sur la nouvelle installation (sur le PC avec GPU), de nouveau besoin de faire la configuration de Micro-XRCE-DDS-Agent à chaque fois, alors que ce n'était plus le cas avant et que le Dockerfile n'a pas changé à ce niveau-là
+- Changement du terrain pour inclure une partie plate au milieu, pour pouvoir y faire spawn les robots, et adaptation de la position des arbres vis-à-vis du relief
+- Clonage du github des robots agilex effectué : directement dans la branche humble il y a eu des erreurs -> donc switch sur la branche master, mais cette dernière est en ROS1 -> après avoir supprimé le package, cloné dans la branche master, et switch sur la branche humble, plus de problème
+=> Un certain nombre de modèles de la branche master n'ont pas été migrés vers ROS2, et donc vers la branche humble (dont 3 modèles sur les 4 demandés, pour le Ranger 4WS 4WD, modèle présent sur aucune des 2 branches, seuelemnt ranger_mini)
+=> Pour le scout mini, package de Simu avec les bons plugins etc, mais prévu pour Gazebo Classic et non la nouvelle version, donc qq modifs à faire à ce niveau-là, en plus de celles pour intégrer le robot au reste de la simulation (modifif des launchfiles pour le faire spawn dans le même monde Gazebo, avec un id...)
+=> Changement du plugin de contrôle du scout mini pour utiliser celui du package gz_ros2_control, déjà utilisé pour le Summit XL + changement de la commande de spawn pour l'adapter à Gazebo Harmonic au lieu de Gazebo Classic

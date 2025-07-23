@@ -1,4 +1,4 @@
-<=====UTILISATUER/GROUPES/DROITS=====>
+<===== UTILISATUER/GROUPES/DROITS =====>
 
 - Connaître son nom d'utilisateur :
 
@@ -24,11 +24,13 @@ sudo chown -R $USER:$USER <path_to_directory>
 
 lsb_release -a
 
-<======PROCESSUS ET FICHIERS=====>
+<====== PROCESSUS ET FICHIERS =====>
 
 - Gestionnaire des tâches (% de CPU / Mémoire / ... utilisé par chaque process) :
 
 htop (sudo apt install htop)
+
+=> Pour le GPU : nvtop (sudo apt install nvtop)
 
 - Vérifier les instances d'une appli en cours d'exécution :
 
@@ -73,7 +75,7 @@ sudo swapoff /swapfile
 # Le supprimer
 sudo rm /swapfile
 
-<=====PACKAGES=====>
+<===== PACKAGES =====>
 
 - Regarder de quel pkg provient un exécutable :
 
@@ -83,7 +85,7 @@ dpkg -S $(which <executable>)
 
 apt-cache rdepends <pkg>
 
-<=====GITHUB======>
+<===== GITHUB ======>
 
 - Changer de branche :
 
@@ -136,6 +138,11 @@ git remote set-url <remote> <url> (ex : git remote set-url origin https://github
 - Récupérer les branches du remote :
 
 git fetch <remote> (ex: git fetch origin)
+git fetch --prune <remote> (pour prendre en compte les branches qui ont été supprimées sur le remote)
+
+- Supprimer une branche locale :
+
+git branch -d <branch>
 
 - Lier la branche locale avec la branche distante :
 
@@ -171,7 +178,7 @@ OU
 
 git clone --recurse-submodules <url_repository>
 
-<=====PYTHON=====> 
+<===== PYTHON =====> 
 
 - Lister les modules python installés :
 
@@ -185,13 +192,13 @@ pip show <module_pyhton>
 
 pip install <module_pyhton>==<version> (ex : pip install setuptools==68)
 
-<=====ROS2=====>
+<===== ROS2 =====>
 
 - Echo un champ d'un topic :
 
 ros2 topic echo <topic> --field <champ>
 
-<=====URDF/XACRO=====>
+<===== URDF/XACRO =====>
 
 - Installer xacro : 
 
@@ -201,19 +208,19 @@ sudo apt install ros-humble-xacro
 
 ros2 run xacro xacro <file>.urdf.xacro > <file>.urdf
 
-<=====GAZEBO=====>
+<===== GAZEBO =====>
 
 - Vérifier les contrôleurs actifs :
 
 ros2 control list_controllers
 
-<=====COMPILATEURS(NINJA)=====>
+<===== COMPILATEURS(NINJA) =====>
 
 - Voir les cibles disponibles avec ninja :
 
 ninja -t targets (dans le dossier contenant le build.ninja)
 
-<======GESTION CHALEUR & VENTILATEURS=====>
+<====== GESTION CHALEUR & VENTILATEURS =====>
 
 ?
 sudo apt install tlp
@@ -234,3 +241,9 @@ cpufreq-info (installé avec sudo apt install cpufrequtils)
 sudo cpupower-gui (installé avec sudo apt install cpupower-gui)
 OU
 sudo cpupower frequency-set -u 2.0GHz (CLI (Command Line Interface), installé avec sudo apt install linux-tools-$(uname -r) linux-tools-common)
+
+<===== GPU =====>
+
+- Vérifier l'accélération graphique (pour Docker) : 
+
+glxinfo | grep render (installé avec sudo apt-get install mesa-utils)

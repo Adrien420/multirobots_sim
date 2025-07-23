@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=QGroundControl
+GenericName=Ground Control Station
+Comment=Open Source Ground Control App
+Icon=QGroundControl
+Exec=QGroundControl
+Terminal=false
+Categories=Utility;

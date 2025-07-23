@@ -22,3 +22,7 @@
 	path = multirobots_ws/src/sdformat_urdf
 	url = https://github.com/Adrien420/sdformat_urdf.git
 	branch = humble
+[submodule "multirobots_ws/src/ugv_gazebo_sim"]
+	path = multirobots_ws/src/ugv_gazebo_sim
+	url = https://github.com/Adrien420/ugv_gazebo_sim.git
+	branch = humble

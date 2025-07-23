@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>org.mavlink.qgroundcontrol</id>
+
+  <name>QGroundControl</name>
+  <summary>Open Source Ground Control App</summary>
+  <developer_name>QGroundControl</developer_name>
+
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-3.0</project_license>
+
+  <recommends>
+    <control>pointing</control>
+    <control>keyboard</control>
+    <control>touch</control>
+    <control>gamepad</control>
+  </recommends>
+
+  <description>
+    <p>
+      Open Source Ground Control App
+    </p>
+  </description>
+
+  <content_rating type="oars-1.1"/>
+
+  <releases>
+    <release date="2025-06-18T12:15:54-07:00" version="5.0.3"/>
+  </releases>
+
+  <launchable type="desktop-id">org.mavlink.qgroundcontrol.desktop</launchable>
+  <screenshots>
+    <screenshot type="default">
+      <image>https://docs.qgroundcontrol.com/assets/quickstart/ConnectedVehicle.jpg</image>
+    </screenshot>
+  </screenshots>
+
+  <url type="homepage">qgroundcontrol.com</url>
+  <url type="help">https://docs.qgroundcontrol.com/master/en/index.html</url>
+  <url type="bugtracker">https://github.com/mavlink/qgroundcontrol/issues</url>
+
+  <categories>
+    <category>Utility</category>
+    <category>Maps</category>
+  </categories>
+
+  <provides>
+    <binary>QGroundControl</binary>
+  </provides>
+</component>

@@ -9,7 +9,6 @@ from launch.substitutions import LaunchConfiguration
 from launch.event_handlers import OnProcessExit
 
 def launch_setup(context):
-    use_rosbag = LaunchConfiguration('use_rosbag')
     nb_summits = int(LaunchConfiguration('nb_summits').perform(context))
 
     spawn_summits_cmds = []
@@ -49,7 +48,6 @@ def launch_setup(context):
 def generate_launch_description():
     
     ld = LaunchDescription([
-        DeclareLaunchArgument('use_rosbag', default_value='false'),
         DeclareLaunchArgument('nb_summits', default_value='2'),
         OpaqueFunction(function=launch_setup),
     ])
