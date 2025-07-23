@@ -44,7 +44,7 @@ def launch_setup(context):
     
     generate_yaml_with_namespace(context, summit_id)
     
-     # Path to the xacro file
+    # Path to the xacro file
     xacro_file = PathJoinSubstitution([
         FindPackageShare("summit_xl_description"),
         "robots",
@@ -53,7 +53,6 @@ def launch_setup(context):
 
     # Robot's description (URDF generated from the .xacro thanks to the command xacro)
     robot_description_config = ParameterValue(Command(['xacro', ' ', xacro_file, ' id:=', f'{summit_id}']), value_type=str)
-    #robot_description_config = ParameterValue(Command(['xacro', ' ', xacro_file]), value_type=str)
 
     robot_state_publisher_node = TimerAction(
         period=3.0,
@@ -73,18 +72,16 @@ def launch_setup(context):
         executable='parameter_bridge',
         name='gz_bridge',
         arguments=[
-            f'scan_{summit_id}@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
-            f'imu_data_{summit_id}@sensor_msgs/msg/Imu[gz.msgs.IMU',
-            f'navsat_data_{summit_id}@gps_msgs/msg/GPSFix[gz.msgs.NavSat',
-            f'color/image_raw_{summit_id}@sensor_msgs/msg/Image[gz.msgs.Image',
-            f'color/camera_info_{summit_id}@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
-            f'depth/image_raw_{summit_id}/image@sensor_msgs/msg/Image[gz.msgs.Image',
-            f'depth/image_raw_{summit_id}/depth_image@sensor_msgs/msg/Image[gz.msgs.Image',
-            f'depth/image_raw_{summit_id}/points@sensor_msgs/msg/PointCloud2[gz.msgs.PointCloudPacked',
-            f'depth/image_raw_{summit_id}/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
-            f'depth/camera_info_{summit_id}@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
-            '--ros-args', '-p', 'expand_gz_topic_names:=true', '-r', f'__ns:=/summit_xl_{summit_id}',
-            '--remap', f'/summit_xl_{summit_id}/color/camera_info_{summit_id}:=/summit_xl_{summit_id}/color/camera_info',
+            f'{namespace}/scan@sensor_msgs/msg/LaserScan[gz.msgs.LaserScan',
+            f'{namespace}/imu_data@sensor_msgs/msg/Imu[gz.msgs.IMU',
+            f'{namespace}/navsat_data@gps_msgs/msg/GPSFix[gz.msgs.NavSat',
+            f'{namespace}/color/image_raw@sensor_msgs/msg/Image[gz.msgs.Image',
+            f'{namespace}/color/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
+            f'{namespace}/depth/image_raw/image@sensor_msgs/msg/Image[gz.msgs.Image',
+            f'{namespace}/depth/image_raw/depth_image@sensor_msgs/msg/Image[gz.msgs.Image',
+            f'{namespace}/depth/image_raw/points@sensor_msgs/msg/PointCloud2[gz.msgs.PointCloudPacked',
+            f'{namespace}/depth/image_raw/camera_info@sensor_msgs/msg/CameraInfo[gz.msgs.CameraInfo',
+             '--ros-args', '-p', 'expand_gz_topic_names:=true',
             '--log-level', 'info'
         ],
         parameters=[{"use_sim_time": True}],
