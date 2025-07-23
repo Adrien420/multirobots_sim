@@ -16,10 +16,10 @@ docker run --security-opt seccomp=unconfined -it --rm --user="multirobots" --env
 --net host \
 --device /dev/dri \
 -v /dev/dri:/dev/dri \
--v $HOME/multirobots_sim/multirobots_ws:/home/multirobots/multirobots_ws \
--v $HOME/multirobots_sim/.git:/home/multirobots/.git \
--v $HOME/multirobots_sim/.gitmodules:/home/multirobots/.gitmodules \
--v $HOME/multirobots_sim/.gitattributes:/home/multirobots/.gitattributes \
--v $HOME/multirobots_sim/.gitignore:/home/multirobots/.gitignore \
--v $HOME/multirobots_sim/README.md:/home/multirobots/README.md \
+-v $PWD/multirobots_ws:/home/multirobots/multirobots_ws \
+-v $PWD/.git:/home/multirobots/.git \
+-v $PWD/.gitmodules:/home/multirobots/.gitmodules \
+-v $PWD/.gitattributes:/home/multirobots/.gitattributes \
+-v $PWD/.gitignore:/home/multirobots/.gitignore \
+-v $PWD/README.md:/home/multirobots/README.md \
 cristal-container 
