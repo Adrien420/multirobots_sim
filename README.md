@@ -29,11 +29,10 @@ Then restart the system to apply the group changes.
 
 - **Clone the main repository &nbsp;:**
 ```
-cd ~/
 git clone --recursive https://github.com/Adrien420/multirobots_sim.git
 
 # Install Git LFS to pull large files
-cd ~/multirobots_sim/
+cd multirobots_sim/
 sudo apt-get install git-lfs
 git lfs pull
 ```
@@ -51,7 +50,6 @@ git submodule update --init --recursive
 ### -&nbsp; Build the docker image &nbsp;:
 	
 ```	
-cd ~/multirobots_sim/
 docker build -f Docker/Dockerfile --tag cristal-container .
 ```
 
