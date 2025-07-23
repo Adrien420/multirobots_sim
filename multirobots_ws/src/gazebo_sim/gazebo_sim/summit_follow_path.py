@@ -23,8 +23,8 @@ class SummitFollowPath(Node):
 
         # Subscribers
         self.create_subscription(Odometry, self.summit_prefix + '/robotnik_base_controller/odom', self.odom_callback, 10)
-        self.create_subscription(Imu, self.summit_prefix + '/imu_data_' + str(self.get_parameter('summit_id').value), self.imu_callback, 10)
-        self.create_subscription(GPSFix, self.summit_prefix + '/navsat_data_' + str(self.get_parameter('summit_id').value), self.navsat_callback, 10)
+        self.create_subscription(Imu, self.summit_prefix + '/imu_data', self.imu_callback, 10)
+        self.create_subscription(GPSFix, self.summit_prefix + '/navsat_data', self.navsat_callback, 10)
 
         self.path = self.load_path_yaml('/home/multirobots/multirobots_ws/install/gazebo_sim/share/gazebo_sim/config/summit_path.yaml', self.get_parameter('path_name').value)
         self.current_odom_pose = None
