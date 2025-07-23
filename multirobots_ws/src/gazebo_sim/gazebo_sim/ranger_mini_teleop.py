@@ -26,12 +26,12 @@ class RangerMiniTeleop(Node) :
         super().__init__('ranger_mini_teleop')
         
         # Parameters
-        # self.declare_parameter('summit_id', 1)
-        # self.summit_name = '/summit_xl_' + str(self.get_parameter('summit_id').value)
+        self.declare_parameter('ranger_id', 1)
+        self.ranger_name = '/ranger_mini_' + str(self.get_parameter('ranger_id').value)
     
         # Create publishers
         self.cmd_vel_pub = self.create_publisher(
-            Twist, '/cmd_vel', 10)
+            Twist, self.ranger_name + '/cmd_vel', 10)
 
         # Initialize variables
         self.settings = termios.tcgetattr(sys.stdin)

@@ -12,7 +12,7 @@ import numpy as np
 
 class StaticTfPublisher(Node):
     def __init__(self):
-        super().__init__('static_tf2_broadcaster')
+        super().__init__('tf_publisher')
         
         qos_profile = QoSProfile(
             reliability=ReliabilityPolicy.BEST_EFFORT,
@@ -39,6 +39,21 @@ class StaticTfPublisher(Node):
         self.static_tf_summit.transform.rotation.y = 0.0
         self.static_tf_summit.transform.rotation.z = 0.0
         self.static_tf_summit.transform.rotation.w = 1.0
+
+        # Create static tf between world and ranger's base frame, without any translation or rotation
+        self.static_tf_ranger = TransformStamped()
+        self.static_tf_ranger.header.stamp = self.get_clock().now().to_msg()
+        self.static_tf_ranger.header.frame_id = 'world'
+        self.static_tf_ranger.child_frame_id = 'ranger_mini_1/base_link'
+
+        self.static_tf_ranger.transform.translation.x = 0.0
+        self.static_tf_ranger.transform.translation.y = 1.0
+        self.static_tf_ranger.transform.translation.z = 0.0
+
+        self.static_tf_ranger.transform.rotation.x = 0.0
+        self.static_tf_ranger.transform.rotation.y = 0.0
+        self.static_tf_ranger.transform.rotation.z = 0.0
+        self.static_tf_ranger.transform.rotation.w = 1.0
         
         if self.get_parameter('nb_drones').value > 0:
             self.subscription = self.create_subscription(
@@ -48,7 +63,7 @@ class StaticTfPublisher(Node):
                 qos_profile
             )
         else:
-            self.broadcaster.sendTransform(self.static_tf_summit)
+            self.broadcaster.sendTransform([self.static_tf_summit, self.static_tf_ranger])
         
     def handle_odom(self, msg):
         self.tf_px4 = TransformStamped()
@@ -68,7 +83,7 @@ class StaticTfPublisher(Node):
         self.tf_px4.transform.rotation.w = float(q_rviz[3])
         
         # Envoyer les tfs
-        self.broadcaster.sendTransform([self.static_tf_summit, self.tf_px4])
+        self.broadcaster.sendTransform([self.static_tf_summit, self.static_tf_ranger, self.tf_px4])
 
 def main():
     rclpy.init()
