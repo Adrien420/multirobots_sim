@@ -143,7 +143,7 @@ class Px4FollowPath(Node) :
         msg.position[0] = target_pose.position.y
         msg.position[1] = target_pose.position.x
         msg.position[2] = -target_pose.position.z
-        msg.yaw = self.get_yaw_from_quaternion(target_pose.orientation) + np.pi/2
+        msg.yaw = -self.get_yaw_from_quaternion(target_pose.orientation) + np.pi/2
 
         # Computation of the error between targetted and current positions
         dx = target_pose.position.y - self.vehicle_local_position.x
@@ -151,9 +151,8 @@ class Px4FollowPath(Node) :
         dz = target_pose.position.z + self.vehicle_local_position.z
         distance = math.sqrt(dx**2+dy**2+dz**2)
 
-        target_angle = self.get_yaw_from_quaternion(target_pose.orientation)
-        angle_target_error = self.normalize_angle(target_angle + np.pi/2 - self.vehicle_local_position.heading)
-        #print(f'target : {target_angle} / angle_target_error : {angle_target_error} / distance : {distance} / {dx} / {dy} / {dz}')
+        angle_target_error = self.normalize_angle(msg.yaw - self.vehicle_local_position.heading)
+        #print(f'target : {msg.yaw} / angle_target_error : {angle_target_error} / distance : {distance} / {dx} / {dy} / {dz}')
 
         # If the error (in translation & rotation) is small enough, we move on to the next position
         if distance < 0.2 and abs(angle_target_error) < 0.035:

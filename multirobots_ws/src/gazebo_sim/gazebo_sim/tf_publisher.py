@@ -36,7 +36,7 @@ class TfPublisher(Node):
 
         # Translations (adapt to summit's initial pose)
         self.static_tf_summit.transform.translation.x = 0.0
-        self.static_tf_summit.transform.translation.y = 1.0
+        self.static_tf_summit.transform.translation.y = -1.0
         self.static_tf_summit.transform.translation.z = 0.0
 
         # Rotations (not any here)
@@ -54,7 +54,7 @@ class TfPublisher(Node):
 
         # Translations (adapt to summit's initial pose)
         self.static_tf_ranger.transform.translation.x = 0.0
-        self.static_tf_ranger.transform.translation.y = 2.0
+        self.static_tf_ranger.transform.translation.y = 1.0
         self.static_tf_ranger.transform.translation.z = 0.0
 
         # Rotations (not any here)
