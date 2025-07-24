@@ -1,4 +1,6 @@
+# Name of the trajectory
 square:
+  # List of positions to follow
   poses:
     - [0.0, 0.0, 0]
     - [7.0, 0.0, 90]

@@ -7,8 +7,11 @@ from nav_msgs.msg import Odometry
 from lifecycle_msgs.msg import TransitionEvent
 
 class WaitTopicCreation(Node):
+    """Wait for the creation of a topic linked to a chosen robot (indicating that the robot is ready), before shutting down to send a signal"""
     def __init__(self):
         super().__init__('wait_topic_creation')
+
+        # Parameters
         self.declare_parameter('robot_type', 'drone')
         self.robot_type = self.get_parameter('robot_type').value
         self.declare_parameter('summit_id', 1)
@@ -16,6 +19,7 @@ class WaitTopicCreation(Node):
         self.declare_parameter('ranger_id', 1)
         self.ranger_id = str(self.get_parameter('ranger_id').value)
 
+        # Configure QoS profile for publishing and subscribing
         qos_profile = QoSProfile(
             reliability=ReliabilityPolicy.BEST_EFFORT,
             durability=DurabilityPolicy.TRANSIENT_LOCAL,
@@ -23,6 +27,7 @@ class WaitTopicCreation(Node):
             depth=1
         )
 
+        # Subscirbers (determined by the chosen type of robot)
         if self.robot_type == "drone":
             self.get_logger().info("Waiting for topic /px4_1/fmu/out/vehicle_odometry to be created...")
             self.sub = self.create_subscription(
@@ -37,14 +42,17 @@ class WaitTopicCreation(Node):
                 TransitionEvent, f'/ranger_mini_{self.ranger_id}/forward_position_controller/transition_event', self.ranger_callback, 10)
 
     def drone_callback(self, msg):
+        """Callback function for vehicle_odometry topic subscriber"""
         self.get_logger().info(f"Topic /px4_1/fmu/out/vehicle_odometry created")
         raise SystemExit
     
     def summit_callback(self, msg):
+        """Callback function for odom topic subscriber"""
         self.get_logger().info(f"Topic /summit_xl_{self.summit_id}/robotnik_base_controller/odom created")
         raise SystemExit
     
     def ranger_callback(self, msg):
+        """Callback function for transition_event topic subscriber"""
         self.get_logger().info(f"Topic /ranger_mini_{self.ranger_id}/forward_position_controller/transition_event created")
         raise SystemExit
 

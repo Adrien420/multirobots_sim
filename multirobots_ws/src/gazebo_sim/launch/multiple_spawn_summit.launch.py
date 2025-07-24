@@ -13,6 +13,7 @@ def launch_setup(context):
 
     spawn_summits_cmds = []
 
+    # Include launch file spawning summit xl with its id, nb_drones times 
     for i in range(1, nb_summits+1):
         spawn_summits_cmd = IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
@@ -26,7 +27,7 @@ def launch_setup(context):
         
         if i==1:
             spawn_summits_cmds.append(spawn_summits_cmd)
-        else:
+        else: # Wait for the previous summit xl to be instantiated, so that its controllers can be spawned correctly
             wait_summit_ready_cmd = Node(
                 package='gazebo_sim',
                 executable='wait_topic_creation',

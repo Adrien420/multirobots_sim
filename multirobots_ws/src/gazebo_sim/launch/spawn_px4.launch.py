@@ -10,6 +10,7 @@ from launch.substitutions import LaunchConfiguration, TextSubstitution
 from launch_ros.actions import Node
 
 def replace_model_uri(match):
+    """Replace all paths to dae meshes, using package:// instead of model://, so that these meshes can be correctly found"""
     model_name = match.group(1)
     rest = match.group(2)
 
@@ -17,22 +18,30 @@ def replace_model_uri(match):
 
 
 def patch_nested_model(robot_desc:str, model_name:str):
+    """Adapt the sdf file included in the drone's model file to the limitations of the sdformat_urdf package"""
+
+    # Path of the nested model file
     model_file = "/home/multirobots/multirobots_ws/src/PX4-Autopilot/Tools/simulation/gz/models/" + model_name + "/model.sdf"
 
+    # Creation of a temporary file including the necessary modifications
     with open(model_file, 'r') as infp:
         tmp_model_file = infp.read()
 
+    # Use of regex to target and replace all paths to dae meshes
     tmp_model_file = re.sub(r'model://([^/<\s]+)(/[^<\s]*)?', replace_model_uri, tmp_model_file)
     
+    # Use fixed joints instead of revolute joints for rotors, to avoid the need of controllers and allow Rviz to get the full TF tree
     for i in range(4):
         tmp_model_file = tmp_model_file.replace(
             f'<joint name="rotor_{i}_joint" type="revolute">',
             f'<joint name="rotor_{i}_joint" type="fixed">'
         )
 
+    # Save the temporary file
     with open('/tmp/' + model_name, 'w') as outfp:
         outfp.write(tmp_model_file)
         
+    # Replace the path of the included sdf file, in the drone's model file
     robot_desc = robot_desc.replace(
         'model://' + model_name,
         '/tmp/' + model_name
@@ -49,12 +58,13 @@ def launch_setup(context):
     with open(sdf_file, 'r') as infp:
         robot_desc = infp.read()
 
-    # Adapt the sdf file to the limitations of the sdformat_urdf package
+    # Adapt the sdf files to the limitations of the sdformat_urdf package
     robot_desc = patch_nested_model(robot_desc, "x500_base")
     robot_desc = patch_nested_model(robot_desc, "lidar_2d_v2")
     robot_desc = patch_nested_model(robot_desc, "mono_cam")
     robot_desc = patch_nested_model(robot_desc, "OakD-Lite")
 
+    # Publish the sdf file in the robot_description topic, using the plugin provided by sdformat_urdf package
     robot_state_publisher_node = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
@@ -63,6 +73,7 @@ def launch_setup(context):
         parameters=[{"robot_description": robot_desc, "use_sim_time": True}]
     )
 
+    # Bridge sensors topics from Gazebo to ROS2
     gz_bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -82,6 +93,7 @@ def launch_setup(context):
         output='screen'
     )
 
+    # Spawn the drone using the PX4 firmware
     spawn_px4_cmd = ExecuteProcess(
         cmd=[
             '/home/multirobots/multirobots_ws/src/PX4-Autopilot/build/px4_sitl_default/bin/px4',

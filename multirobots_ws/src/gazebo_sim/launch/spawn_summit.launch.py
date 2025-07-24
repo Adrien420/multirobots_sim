@@ -9,6 +9,7 @@ from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 
 def generate_yaml_with_namespace(context, summit_id):
+    """Generate a yaml file for the controllers, including the namespace"""
     namespace = f"summit_xl_{summit_id}"
     original_yaml_path = os.path.join(
         FindPackageShare("summit_xl_description").perform(context),
@@ -42,6 +43,7 @@ def launch_setup(context):
     
     namespace = f'summit_xl_{summit_id}'
     
+    # Create a temporary configuration file for the controllers, adding the namespace in it
     generate_yaml_with_namespace(context, summit_id)
     
     # Path to the xacro file
@@ -51,10 +53,10 @@ def launch_setup(context):
         "summit_xl_std.urdf.xacro"
     ])
 
-    # Robot's description (URDF generated from the .xacro thanks to the command xacro)
+    # Robot's description (urdf generated from the xacro file, thanks to the command xacro)
     robot_description_config = ParameterValue(Command(['xacro', ' ', xacro_file, ' id:=', f'{summit_id}']), value_type=str)
 
-    robot_state_publisher_node = TimerAction(
+    robot_state_publisher_node = TimerAction( # Wait 3s before launching this node, which seems to help the controllers to load correctly
         period=3.0,
         actions=[
             Node(
@@ -67,6 +69,7 @@ def launch_setup(context):
         ]
     )
     
+    # Bridge sensors topics from Gazebo to ROS2
     gz_bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -103,6 +106,8 @@ def launch_setup(context):
         parameters=[{"use_sim_time": True}],
         output='screen'
     )
+    
+    # Spawn the controllers
     
     robotnik_controller_spawner = Node(
         package="controller_manager",

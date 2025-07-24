@@ -13,6 +13,7 @@ def launch_setup(context):
 
     spawn_rangers_cmds = []
 
+    # Include launch file spawning ranger mini with its id, nb_drones times 
     for i in range(1, nb_rangers+1):
         spawn_rangers_cmd = IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
@@ -26,7 +27,7 @@ def launch_setup(context):
         
         if i==1:
             spawn_rangers_cmds.append(spawn_rangers_cmd)
-        else:
+        else: # Wait for the previous ranger mini to be instantiated, so that its controllers can be spawned correctly
             wait_ranger_ready_cmd = Node(
                 package='gazebo_sim',
                 executable='wait_topic_creation',

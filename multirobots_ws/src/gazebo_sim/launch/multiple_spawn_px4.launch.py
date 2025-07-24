@@ -11,6 +11,7 @@ def launch_setup(context):
 
     spawn_drones_cmds = []
 
+    # Include launch file spawning px4 drone with its id, nb_drones times 
     for i in range(1, nb_drones+1):
         spawn_drones_cmds.append(
             IncludeLaunchDescription(

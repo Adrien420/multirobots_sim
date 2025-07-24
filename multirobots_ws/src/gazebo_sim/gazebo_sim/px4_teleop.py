@@ -3,7 +3,6 @@ from rclpy.node import Node
 from rclpy.qos import QoSProfile, ReliabilityPolicy, HistoryPolicy, DurabilityPolicy
 from px4_msgs.msg import VehicleStatus, VehicleCommand, OffboardControlMode, TrajectorySetpoint, VehicleLocalPosition
 
-import time
 import sys
 import select
 import termios
@@ -35,7 +34,7 @@ class Px4Teleop(Node) :
         # Parameters
         self.declare_parameter('drone_id', 1)
 
-        # Configure QoS profile for publishing and subscribing
+        # Configure QoS profile for publishing and subscribing to PX4's topics
         qos_profile = QoSProfile(
             reliability=ReliabilityPolicy.BEST_EFFORT,
             durability=DurabilityPolicy.TRANSIENT_LOCAL,
@@ -70,10 +69,12 @@ class Px4Teleop(Node) :
         self.timer = self.create_timer(0.1, self.timer_callback)
         
     def get_key(self):
+        """Detect the key currently pressed by reading in the stdin"""
         tty.setraw(sys.stdin.fileno())
+        # Select stdin to read
         rlist, _, _ = select.select([sys.stdin], [], [], 0.1)
         if rlist:
-            key = sys.stdin.read(1)
+            key = sys.stdin.read(1) # 1 char
             if key == '\x1b': # Arrow -> 2 chars
                 key += sys.stdin.read(2)
         else:
@@ -82,15 +83,15 @@ class Px4Teleop(Node) :
         return key
 
     def vehicle_local_position_callback(self, vehicle_local_position):
-        """Callback function for vehicle_local_position topic subscriber."""
+        """Callback function for vehicle_local_position topic subscriber"""
         self.vehicle_local_position = vehicle_local_position
 
     def vehicle_status_callback(self, vehicle_status):
-        """Callback function for vehicle_status topic subscriber."""
+        """Callback function for vehicle_status topic subscriber"""
         self.vehicle_status = vehicle_status
         
     def reboot(self):
-        """Send a reboot command to the vehicle."""
+        """Send a reboot command to the vehicle"""
         self.publish_vehicle_command(
             VehicleCommand.VEHICLE_CMD_PREFLIGHT_REBOOT_SHUTDOWN,
             param1=1.0
@@ -99,30 +100,30 @@ class Px4Teleop(Node) :
         self.reboot_cmd_sent = True
 
     def arm(self):
-        """Send an arm command to the vehicle."""
+        """Send an arm command to the vehicle"""
         self.publish_vehicle_command(
             VehicleCommand.VEHICLE_CMD_COMPONENT_ARM_DISARM, param1=1.0)
         self.get_logger().info('Arm command sent')
 
     def disarm(self):
-        """Send a disarm command to the vehicle."""
+        """Send a disarm command to the vehicle"""
         self.publish_vehicle_command(
             VehicleCommand.VEHICLE_CMD_COMPONENT_ARM_DISARM, param1=0.0)
         self.get_logger().info('Disarm command sent')
 
     def engage_offboard_mode(self):
-        """Switch to offboard mode."""
+        """Switch to offboard mode"""
         self.publish_vehicle_command(
             VehicleCommand.VEHICLE_CMD_DO_SET_MODE, param1=1.0, param2=6.0)
         self.get_logger().info("Switching to offboard mode")
 
     def land(self):
-        """Switch to land mode."""
+        """Switch to land mode"""
         self.publish_vehicle_command(VehicleCommand.VEHICLE_CMD_NAV_LAND)
         self.get_logger().info("Switching to land mode")
 
     def publish_offboard_control_heartbeat_signal(self):
-        """Publish the offboard control mode."""
+        """Publish the offboard control mode"""
         msg = OffboardControlMode()
         msg.position = True
         msg.velocity = True
@@ -133,7 +134,7 @@ class Px4Teleop(Node) :
         self.offboard_control_mode_publisher.publish(msg)
 
     def publish_velocity(self):
-        """Publish the trajectory setpoint."""
+        """Publish the trajectory setpoint"""
         msg = TrajectorySetpoint()
         
         key = self.get_key()
@@ -163,6 +164,7 @@ class Px4Teleop(Node) :
             raise KeyboardInterrupt
         
         # Horizontal position
+        # Disable position controller
         msg.position[0] = float("nan")
         msg.position[1] = float("nan")
         msg.yaw = float("nan")
@@ -170,14 +172,14 @@ class Px4Teleop(Node) :
         # Vertical position
         if key == '\x1b[A' or key == '\x1b[B':
             msg.position[2] = float("nan") # Disable position controller for altitude
-        else:
+        else: # If no velocity commands are sent to control the altitude, let the drone hover at its current height
             msg.position[2] = self.vehicle_local_position.z
     
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         self.trajectory_setpoint_publisher.publish(msg)
 
     def publish_vehicle_command(self, command, **params) -> None:
-        """Publish a vehicle command."""
+        """Publish a vehicle command"""
         msg = VehicleCommand()
         msg.command = command
         msg.param1 = params.get("param1", 0.0)
@@ -187,7 +189,8 @@ class Px4Teleop(Node) :
         msg.param5 = params.get("param5", 0.0)
         msg.param6 = params.get("param6", 0.0)
         msg.param7 = params.get("param7", 0.0)
-        msg.target_system = self.get_parameter('drone_id').value + 1 # Drone targetted : drone's id + 1
+        # Drone targetted : drone's id + 1
+        msg.target_system = self.get_parameter('drone_id').value + 1 
         msg.target_component = 1
         msg.source_system = 1
         msg.source_component = 1
@@ -196,7 +199,8 @@ class Px4Teleop(Node) :
         self.vehicle_command_publisher.publish(msg)
 
     def timer_callback(self) -> None:
-        """Callback function for the timer."""
+        """Callback function for the timer"""
+        # Check if the drone is ready to be armed
         if not self.vehicle_status.pre_flight_checks_pass:
             if self.vehicle_status.latest_disarming_reason == 6 and not self.reboot_cmd_sent: # Failsafe
                 self.reboot()
@@ -206,16 +210,19 @@ class Px4Teleop(Node) :
         
         self.publish_offboard_control_heartbeat_signal()
 
+        # Switch to offboard mode & arm the drone after spending enough signals to the drone
         if self.offboard_setpoint_counter == 10:
             self.engage_offboard_mode()
             self.arm()
             print(keys_manual)
             
+        # Switch back to offboard & arm the drone again (for instance, if the drone has switched mode after entering failsafe mode)
         if self.offboard_setpoint_counter > 15 and self.vehicle_status.nav_state != VehicleStatus.NAVIGATION_STATE_OFFBOARD:
             termios.tcsetattr(sys.stdin, termios.TCSADRAIN, self.settings)
             self.engage_offboard_mode()
             self.arm()
 
+        # In offboard mode, send the targetted velocity
         if self.vehicle_status.nav_state == VehicleStatus.NAVIGATION_STATE_OFFBOARD:
             self.publish_velocity()
 

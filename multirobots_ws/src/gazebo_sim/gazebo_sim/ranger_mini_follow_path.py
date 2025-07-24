@@ -9,6 +9,7 @@ import numpy as np
 import yaml, math
 
 class RangerFollowPath(Node):
+    """Same algorithm that summit_follow_path.py, refer to it for additionnal comments"""
     def __init__(self):
         super().__init__('ranger_follow_path')
 

@@ -16,7 +16,7 @@ class Px4FollowPath(Node) :
         self.declare_parameter('drone_id', 1)
         self.declare_parameter('path_name', 'path1')
 
-        # Configure QoS profile for publishing and subscribing
+        # Configure QoS profile for publishing and subscribing to PX4's topics
         qos_profile = QoSProfile(
             reliability=ReliabilityPolicy.BEST_EFFORT,
             durability=DurabilityPolicy.TRANSIENT_LOCAL,
@@ -48,14 +48,19 @@ class Px4FollowPath(Node) :
         # Create a timer to publish control commands
         self.timer = self.create_timer(0.1, self.timer_callback)
 
+        # Load the path to follow
         self.path = self.load_path_yaml('/home/multirobots/multirobots_ws/install/gazebo_sim/share/gazebo_sim/config/px4_path.yaml', self.get_parameter('path_name').value)
+        # Select the first position to target
         self.current_target_pose = 0
 
     def load_path_yaml(self, yaml_file, path_name):
+        """Load the yaml configuration file containing paths for PX4 & get positions of the chosen path"""
         with open(yaml_file, 'r') as f:
             data = yaml.safe_load(f)
 
+        # Positions of the path
         poses = data[path_name]['poses']
+        # Create a Path msg for Rviz visualization (Interfacing with Rviz not implemented yet)
         path = Path()
         path.header.frame_id = 'world'
         path.header.stamp = self.get_clock().now().to_msg()
@@ -67,6 +72,7 @@ class Px4FollowPath(Node) :
             pose.pose.position.y = pose_[1] 
             pose.pose.position.z = pose_[2]
             yaw = pose_[3]
+            # Transform the desired orientation in quatrenions
             q = Rotation.from_euler('z', np.deg2rad(yaw)).as_quat()
             pose.pose.orientation.x = q[0] 
             pose.pose.orientation.y = q[1] 
@@ -77,15 +83,15 @@ class Px4FollowPath(Node) :
         return path
 
     def vehicle_local_position_callback(self, vehicle_local_position):
-        """Callback function for vehicle_local_position topic subscriber."""
+        """Callback function for vehicle_local_position topic subscriber"""
         self.vehicle_local_position = vehicle_local_position
 
     def vehicle_status_callback(self, vehicle_status):
-        """Callback function for vehicle_status topic subscriber."""
+        """Callback function for vehicle_status topic subscriber"""
         self.vehicle_status = vehicle_status
         
     def reboot(self):
-        """Send a reboot command to the vehicle."""
+        """Send a reboot command to the vehicle"""
         self.publish_vehicle_command(
             VehicleCommand.VEHICLE_CMD_PREFLIGHT_REBOOT_SHUTDOWN,
             param1=1.0
@@ -94,13 +100,13 @@ class Px4FollowPath(Node) :
         self.reboot_cmd_sent = True
 
     def arm(self):
-        """Send an arm command to the vehicle."""
+        """Send an arm command to the vehicle"""
         self.publish_vehicle_command(
             VehicleCommand.VEHICLE_CMD_COMPONENT_ARM_DISARM, param1=1.0)
         self.get_logger().info('Arm command sent')
 
     def disarm(self):
-        """Send a disarm command to the vehicle."""
+        """Send a disarm command to the vehicle"""
         self.publish_vehicle_command(
             VehicleCommand.VEHICLE_CMD_COMPONENT_ARM_DISARM, param1=0.0)
         self.get_logger().info('Disarm command sent')
@@ -112,12 +118,12 @@ class Px4FollowPath(Node) :
         self.get_logger().info("Switching to offboard mode")
 
     def land(self):
-        """Switch to land mode."""
+        """Switch to land mode"""
         self.publish_vehicle_command(VehicleCommand.VEHICLE_CMD_NAV_LAND)
         self.get_logger().info("Switching to land mode")
 
     def publish_offboard_control_heartbeat_signal(self):
-        """Publish the offboard control mode."""
+        """Publish the offboard control mode & ensure the drone get a 'proof of life'"""
         msg = OffboardControlMode()
         msg.position = True
         msg.velocity = True
@@ -127,17 +133,19 @@ class Px4FollowPath(Node) :
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         self.offboard_control_mode_publisher.publish(msg)
 
-    def publish_velocity(self):
-        """Publish the trajectory setpoint."""
+    def publish_position(self):
+        """Publish the trajectory setpoint"""
         msg = TrajectorySetpoint()
 
         target_pose = self.path.poses[self.current_target_pose].pose
         
+        # Give the position in the PX4's coordinate system 
         msg.position[0] = target_pose.position.y
         msg.position[1] = target_pose.position.x
         msg.position[2] = -target_pose.position.z
         msg.yaw = self.get_yaw_from_quaternion(target_pose.orientation) + np.pi/2
 
+        # Computation of the error between targetted and current positions
         dx = target_pose.position.y - self.vehicle_local_position.x
         dy = target_pose.position.x - self.vehicle_local_position.y
         dz = target_pose.position.z + self.vehicle_local_position.z
@@ -145,27 +153,31 @@ class Px4FollowPath(Node) :
 
         target_angle = self.get_yaw_from_quaternion(target_pose.orientation)
         angle_target_error = self.normalize_angle(target_angle + np.pi/2 - self.vehicle_local_position.heading)
-        print(f'target : {target_angle} / angle_target_error : {angle_target_error} / distance : {distance} / {dx} / {dy} / {dz}')
+        #print(f'target : {target_angle} / angle_target_error : {angle_target_error} / distance : {distance} / {dx} / {dy} / {dz}')
 
+        # If the error (in translation & rotation) is small enough, we move on to the next position
         if distance < 0.2 and abs(angle_target_error) < 0.035:
+            # Check if there are remaining positions to follow in the selected path
             if self.current_target_pose < len(self.path.poses)-1:
                 self.current_target_pose += 1
                 self.get_logger().info(f"Reached a waypoint, {len(self.path.poses)-self.current_target_pose} remaining.")
-                self.get_logger().info(f"x : {self.vehicle_local_position.y}, y : {self.vehicle_local_position.x}, z (alt) : {-self.vehicle_local_position.z} z (rot) : {self.vehicle_local_position.heading}")
+                #self.get_logger().info(f"x : {self.vehicle_local_position.y}, y : {self.vehicle_local_position.x}, z (alt) : {-self.vehicle_local_position.z} z (rot) : {self.vehicle_local_position.heading}")
             else:
                 self.get_logger().info(f"Reached endpoint")
-                self.get_logger().info(f"x : {self.vehicle_local_position.y}, y : {self.vehicle_local_position.x}, z (alt) : {-self.vehicle_local_position.z} z (rot) : {self.vehicle_local_position.heading}")
+                #self.get_logger().info(f"x : {self.vehicle_local_position.y}, y : {self.vehicle_local_position.x}, z (alt) : {-self.vehicle_local_position.z} z (rot) : {self.vehicle_local_position.heading}")
                 raise SystemExit
     
         msg.timestamp = int(self.get_clock().now().nanoseconds / 1000)
         self.trajectory_setpoint_publisher.publish(msg)
 
     def get_yaw_from_quaternion(self, q):
+        """Get the yaw rotation from the orientation in quaterions"""
         siny_cosp = 2 * (q.w * q.z + q.x * q.y)
         cosy_cosp = 1 - 2 * (q.y * q.y + q.z * q.z)
         return math.atan2(siny_cosp, cosy_cosp)
     
     def normalize_angle(self, angle):
+        """Normalize the angle to remain in the [-pi;pi] range"""
         while angle > np.pi:
             angle -= 2 * np.pi
         while angle < -np.pi:
@@ -173,7 +185,7 @@ class Px4FollowPath(Node) :
         return angle
 
     def publish_vehicle_command(self, command, **params) -> None:
-        """Publish a vehicle command."""
+        """Publish a vehicle command"""
         msg = VehicleCommand()
         msg.command = command
         msg.param1 = params.get("param1", 0.0)
@@ -183,7 +195,8 @@ class Px4FollowPath(Node) :
         msg.param5 = params.get("param5", 0.0)
         msg.param6 = params.get("param6", 0.0)
         msg.param7 = params.get("param7", 0.0)
-        msg.target_system = self.get_parameter('drone_id').value + 1 # Drone targetted : drone's id + 1
+        # Drone targetted : drone's id + 1
+        msg.target_system = self.get_parameter('drone_id').value + 1 
         msg.target_component = 1
         msg.source_system = 1
         msg.source_component = 1
@@ -192,9 +205,10 @@ class Px4FollowPath(Node) :
         self.vehicle_command_publisher.publish(msg)
 
     def timer_callback(self) -> None:
-        """Callback function for the timer."""
+        """Callback function for the timer"""
+        # Check if the drone is ready to be armed
         if not self.vehicle_status.pre_flight_checks_pass:
-            if self.vehicle_status.latest_disarming_reason == 6 and not self.reboot_cmd_sent: # Failsafe
+            if self.vehicle_status.latest_disarming_reason == 6 and not self.reboot_cmd_sent: # Failsafe state
                 self.reboot()
                 return
             else: # Initialization
@@ -202,16 +216,19 @@ class Px4FollowPath(Node) :
         
         self.publish_offboard_control_heartbeat_signal()
 
+        # Switch to offboard mode & arm the drone after spending enough signals to the drone
         if self.offboard_setpoint_counter == 10:
             self.engage_offboard_mode()
             self.arm()
             
+        # Switch back to offboard & arm the drone again (for instance, if the drone has switched mode after entering failsafe mode)
         if self.offboard_setpoint_counter > 15 and self.vehicle_status.nav_state != VehicleStatus.NAVIGATION_STATE_OFFBOARD:
             self.engage_offboard_mode()
             self.arm()
 
+        # In offboard mode, send the targetted position
         if self.vehicle_status.nav_state == VehicleStatus.NAVIGATION_STATE_OFFBOARD:
-            self.publish_velocity()
+            self.publish_position()
 
         self.offboard_setpoint_counter += 1
         

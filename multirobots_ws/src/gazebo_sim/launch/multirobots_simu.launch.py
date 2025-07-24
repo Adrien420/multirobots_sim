@@ -9,9 +9,10 @@ from launch.event_handlers import OnProcessExit, OnShutdown
 
 import os, datetime, subprocess
 from ament_index_python import get_package_share_directory, get_package_prefix
-# Attention : get_package_share_directory renvoit le chemin /.../share/pkg_name et non /.../share
+# Warning : get_package_share_directory gives the following path : /.../share/pkg_name, and not /.../share
 
 def on_shutdown(event, context):
+    """Force QGroundControl to close on shutdown, without the need of a confirmation in the app"""
     subprocess.run(["pkill", "-9", "QGroundControl"])
     return
 
@@ -24,10 +25,13 @@ def launch_setup(context):
     nb_rangers = int(LaunchConfiguration('nb_rangers').perform(context))
     nb_drones = int(LaunchConfiguration('nb_drones').perform(context))
 
+    # Path to save rosbags
     now = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     rosbag_save_dir = f'/home/multirobots/multirobots_ws/src/gazebo_sim/rosbag/record_{now}'
     
     # Commands
+
+    # Launch gazebo with the forest world
     gazebo = ExecuteProcess(
         cmd=[
             'gz sim ',
@@ -37,11 +41,12 @@ def launch_setup(context):
                 'forest.sdf '
             ]),
             '-r', # Allow to start the simulation as soon as Gazebo is launched
-            '2>&1 | grep -v "not defined in SDF"'
+            '2>&1 | grep -v "not defined in SDF"' # Remove some warnings caused by the plugin provided by the sdformat_urdf package
         ],
         shell=True
     )
     
+    # Launch Rviz with a configuration file set for one robot of each type
     rviz = Node(
         package='rviz2',
         executable='rviz2',
@@ -51,6 +56,7 @@ def launch_setup(context):
         condition=IfCondition(PythonExpression([use_rviz, ' and "', LaunchConfiguration('nb_drones'), '" == "0"']))
     )
     
+    # Bridge the clock topic for sim time
     gz_bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
@@ -63,15 +69,34 @@ def launch_setup(context):
         output='screen'
     )
 
+    # Topics of each robot simulated 
     topics_summits = []
 
     for i in range(1, nb_summits+1):
-        topics_summits.append(f'summit_xl_{i}/scan_{i}')
-        topics_summits.append(f'summit_xl_{i}/imu_data_{i}')
-        topics_summits.append(f'summit_xl_{i}/navsat_data_{i}')
-        topics_summits.append(f'summit_xl_{i}/color/image_raw_{i}')
+        topics_summits.append(f'summit_xl_{i}/scan')
+        topics_summits.append(f'summit_xl_{i}/imu_data')
+        topics_summits.append(f'summit_xl_{i}/navsat_data')
+        topics_summits.append(f'summit_xl_{i}/color/image_raw')
         topics_summits.append(f'summit_xl_{i}/color/camera_info')
+        topics_summits.append(f'summit_xl_{i}/depth/image_raw/image')
+        topics_summits.append(f'summit_xl_{i}/depth/image_raw/depth_image')
+        topics_summits.append(f'summit_xl_{i}/depth/image_raw/points')
+        topics_summits.append(f'summit_xl_{i}/depth/image_raw/camera_info')
         topics_summits.append(f'summit_xl_{i}/robot_description')
+
+    topics_rangers = []
+
+    for i in range(1, nb_rangers+1):
+        topics_rangers.append(f'ranger_mini_{i}/scan')
+        topics_rangers.append(f'ranger_mini_{i}/imu_data')
+        topics_rangers.append(f'ranger_mini_{i}/navsat_data')
+        topics_rangers.append(f'ranger_mini_{i}/color/image_raw')
+        topics_rangers.append(f'ranger_mini_{i}/color/camera_info')
+        topics_rangers.append(f'ranger_mini_{i}/depth/image_raw/image')
+        topics_rangers.append(f'ranger_mini_{i}/depth/image_raw/depth_image')
+        topics_rangers.append(f'ranger_mini_{i}/depth/image_raw/points')
+        topics_rangers.append(f'ranger_mini_{i}/depth/image_raw/camera_info')
+        topics_rangers.append(f'ranger_mini_{i}/robot_description')
 
     topics_drones = []
 
@@ -79,8 +104,14 @@ def launch_setup(context):
         topics_drones.append(f'world/forest/model/x500_{i}/link/link/sensor/lidar_2d_v2/scan')
         topics_drones.append(f'/world/forest/model/x500_{i}/link/camera_link/sensor/imager/camera_info')
         topics_drones.append(f'/world/forest/model/x500_{i}/link/camera_link/sensor/imager/image')
+        topics_drones.append(f'/world/forest/model/x500_{i}/link/depth_camera_link/sensor/IMX214/camera_info')
+        topics_drones.append(f'/world/forest/model/x500_{i}/link/depth_camera_link/sensor/IMX214/image')
+        topics_drones.append(f'/world/forest/model/x500_{i}/link/depth_camera_link/sensor/StereoOV7251/camera_info')
+        topics_drones.append(f'/world/forest/model/x500_{i}/link/depth_camera_link/sensor/StereoOV7251/depth_image')
+        topics_drones.append(f'/world/forest/model/x500_{i}/link/depth_camera_link/sensor/StereoOV7251/depth_image/points')
         topics_drones.append(f'/px{i}/robot_description')
 
+    # If use_rosbag is set to true, register every topic passed in argument
     rosbag = ExecuteProcess(
         cmd=[
             'ros2', 'bag', 'record',
@@ -89,6 +120,7 @@ def launch_setup(context):
             'clock',
             *topics_summits,
             *topics_drones,
+            *topics_rangers,
             'tf', 'tf_static'
         ],
         condition=IfCondition(use_rosbag),
@@ -102,6 +134,7 @@ def launch_setup(context):
         parameters=[{"use_sim_time": True, "nb_drones":nb_drones}],
     )
     
+    # PX4
     microXRCEagent_cmd = ExecuteProcess(
         cmd=[
             'MicroXRCEAgent udp4 -p 8888'
@@ -127,6 +160,7 @@ def launch_setup(context):
         launch_arguments={'nb_drones':str(nb_drones)}.items()
     )
     
+    # Summit XL
     summit_spawner_cmd = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(get_package_share_directory('gazebo_sim'), 'launch', 'multiple_spawn_summit.launch.py')
@@ -135,6 +169,7 @@ def launch_setup(context):
         condition=IfCondition(PythonExpression(['"', LaunchConfiguration('nb_drones'), '" == "0"'])),
     )
 
+    # Wait for every drones to be ready before spawning the Summit XL
     wait_px4_ready_cmd = Node(
         package='gazebo_sim',
         executable='wait_topic_creation',
@@ -158,6 +193,7 @@ def launch_setup(context):
         ),
     )
 
+    # Wait for every drones to be ready before launching Rviz
     delayed_rviz_cmd = Node(
         package='rviz2',
         executable='rviz2',
@@ -174,6 +210,9 @@ def launch_setup(context):
         ),
     )
 
+    # Ranger Mini
+
+    # Select the robot to wait according to which robots are being simulated
     robot_to_wait = ""
     if nb_summits > 0:
         robot_to_wait = "summit"
@@ -188,6 +227,7 @@ def launch_setup(context):
         condition=IfCondition(PythonExpression(['"', LaunchConfiguration(f'nb_{robot_to_wait}s'), '" == "0"'])),
     )
 
+    # Wait for every selected robots to be ready before spawning the Ranger Mini
     wait_ready_cmd = Node(
         package='gazebo_sim',
         executable='wait_topic_creation',
@@ -211,6 +251,7 @@ def launch_setup(context):
         ),
     )
 
+    # Call the on_shutdown function when shutting down the launch file
     shutdown_handler = RegisterEventHandler(
         OnShutdown(
             on_shutdown=on_shutdown
@@ -247,7 +288,7 @@ def launch_setup(context):
 
 def generate_launch_description():
 
-    # Paths
+    # Paths to the resources
     PX4__model_path = "/home/multirobots/multirobots_ws/src/PX4-Autopilot/Tools/simulation/gz/models"
     summit_model_path = os.path.join(get_package_prefix("summit_xl_description"), 'share')
     summit_sensors_model_path = os.path.join(get_package_prefix("robotnik_sensors"), 'share')

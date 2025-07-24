@@ -20,6 +20,7 @@ def launch_setup(context):
         parameters=[{"use_sim_time": True}]
     )
 
+    # Publish data registered in the rosbag, in the corresponding topics
     rosbag_play = ExecuteProcess(
         cmd=[
             'ros2', 'bag', 'play', rosbag_save_dir,
