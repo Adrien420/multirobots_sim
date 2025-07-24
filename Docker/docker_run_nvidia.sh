@@ -1,15 +1,12 @@
 #! /bin/bash
 
 # You can uncomment some of the commands below if your computer has perfomance issues
-sudo cpupower frequency-set -u 2.0GHz # Limits max frequency of CPUs (to avoid the overheating and noisy ventilation of the computer)
-#sudo chmod 600 /swapfile
-#sudo mkswap /swapfile
-#sudo swapon /swapfile
+#sudo cpupower frequency-set -u 2.0GHz # Limits max frequency of CPUs (to avoid the overheating and noisy ventilation of the computer)
 
-xhost +local:multirobots # Nécessaire pour permettre l'utilisation d'interfaces graphiques dans le conteneur docker
+xhost +local:multirobots # Needed to allow acces to the X11 server and use graphical user interfaces in Docker (for Gazebo GUI, terminator, ...)
 
-# Lancement d'un conteneur docker, basé sur l\'image cristal-container
-# -v utiliser pour monter des dossiers du host, pour pouvoir utiliser et modifier leur contenu dans le conteneur
+# Run the docker container with NVIDIA GPU
+# -v is used to mount the folders from host, so that you can use & modify them in the container
 docker run --security-opt seccomp=unconfined --runtime=nvidia --gpus all -e NVIDIA_DRIVER_CAPABILITIES=all -it --rm --user="multirobots" --env="DISPLAY" \
 --env="QT_X11_NO_MITSHM=1" \
 --volume="/tmp/.X11-unix:/tmp/.X11-unix:rw" \

@@ -67,7 +67,7 @@ RUN rosdep update && \
 USER $USERNAME
 WORKDIR /home/$USERNAME
     
-# Source ROS setup file
+# Source ROS setup files
 RUN echo "source /opt/ros/humble/setup.bash" >> ~/.bashrc
 RUN echo "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" >> ~/.bashrc
 RUN echo "source ~/multirobots_ws/install/setup.bash" >> ~/.bashrc

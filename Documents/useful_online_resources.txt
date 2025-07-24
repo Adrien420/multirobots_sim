@@ -4,6 +4,7 @@ https://medium.com/@alitekes1/gazebo-sim-plugin-and-sensors-for-acquire-data-fro
 https://ibrahimmansur4.medium.com/migrating-from-gazebo-classic-to-gazebo-sim-a-practical-guide-804af2011011
 https://github.com/gazebosim/gz-sim/blob/gz-sim8/examples/worlds/sensors.sdf
 https://github.com/gazebosim/gz-sensors?tab=readme-ov-file
+https://docs.ros.org/en/rolling/p/ros_gz_bridge/
 
 
 - Debug summit (rotations) :
@@ -21,3 +22,12 @@ https://github.com/ros2/rosbag2/issues/696
 
 https://docs.nav2.org/setup_guides/sensors/mapping_localization.html
 )
+
+- Sdf : 
+
+http://sdformat.org/spec?ver=1.12&elem=sdf
+
+
+- Gazebo : 
+
+https://gazebosim.org/api/sim/8/tutorials.html

@@ -1,0 +1,56 @@
+Just a quick guide about the use of submodules in Github. 
+
+	I - How to create a submodule 
+	
+1 - Fork the github repository needed for the submodule (on your Github account)
+
+2 - At the root of your local repository, add the submodule with the following command : 
+git submodule add -b <branch> <url_fork> <submodule_path> (ex : git submodule add -b main https://github.com/Adrien420/PX4-Autopilot.git multirobots_ws/src/PX4-Autopilot)
+
+3 - Commit the submodule : 
+git add <submodule_name> && git commit -m "Commit message"
+
+4 - Push on the remote branch : 
+git push <remote> <branch>
+
+II - Specific cases
+
+1 - Repositories cloned on a tag (like Micro-XRCE-DDS-Agent) :
+
+In the submodule's folder (after creating it), make sure to be on the right tag (git status / git checkout <tag>)
+Since the tag is associated with a specific commit, he is unchangeable (can't commit & push on it)
+Therefore, switch to a new branch with "git switch -c <branch>", and push this branch on the remote with "git push -u <remote> <branch>"
+
+2 - Repository cloned already containing submodules (like PX4-Autopilot) :
+
+In the submodule's folder (after creating it), use "git submodule update --init --recursive" to initiate its own submodules
+
+	III - Delete a submodule
+	
+You can simply remove the submodule section in the .gitmodules file, and then use "git rm --cached <submodule_name>"
+
+By the way, it is also in this file that tou can change the tag/branch used by the submodule
+
+	IV - Troubleshooting with the submodules used in this project
+
+Below are some fixes to the submodules used in this project I had to make. These informations should not be relevant anymore for this project, but I decided to include thme there just in case.
+
+	PX4-Autopilot :
+
+Issue : x500 model not taken into account during the compilation
+
+Solution : In the file src/modules/simulation/simulator_mavlink/sitl_targets_gazebo-classic.cmake the model (x500) was missing
+So I added it in the "set(models...)" part + after line 173 (in "if(gazebo-classic_airframe_found)"), I added "px4_add_board_cmake_build_target(px4_sitl gz_${model})" to the following line
+
+Issue : Errors with the PX4 topics in ROS2 ("Change payload size of '220' bytes is larger than the history payload size of '207' bytes and cannot be resized")
+
+Solution : Switch on the main branch of the px4_msgs, so that the definition of the messages of both packages are identical
+
+	Micro-XRCE-DDS-Agent : 
+	
+Issue : Errors during the compilation
+
+Solution : Put "set(_fastdds_version 2.13)
+				set(_fastdds_tag v2.13.6)" at lines 98-99 of CMakeLists.txt
+
+

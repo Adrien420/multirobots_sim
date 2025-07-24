@@ -198,6 +198,12 @@ pip install <module_pyhton>==<version> (ex : pip install setuptools==68)
 
 ros2 topic echo <topic> --field <champ>
 
+- Pour les contrôleurs :
+
+ros2 control list_hardware_interfaces
+ros2 control list_controllers (ros2 control list_controllers -c /namespace/controller_manager s'il y a un namespace)
+ros2 control set_controller_state joint_state_broadcaster active
+
 <===== URDF/XACRO =====>
 
 - Installer xacro : 
