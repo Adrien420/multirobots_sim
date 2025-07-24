@@ -21,7 +21,8 @@ def launch_setup(context):
             ),
             launch_arguments={
                 'ranger_id':str(i),
-                'x_pose':str(i-1)
+                'x_pose':str(i-1),
+                'y_pose':str(2)
             }.items()
         )
         

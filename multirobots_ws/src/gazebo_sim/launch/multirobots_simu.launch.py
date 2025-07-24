@@ -51,7 +51,7 @@ def launch_setup(context):
         package='rviz2',
         executable='rviz2',
         output='screen',
-        arguments=['-d', os.path.join(get_package_share_directory('gazebo_sim'), 'rviz', 'summit_xl_1.rviz')],
+        arguments=['-d', os.path.join(get_package_share_directory('gazebo_sim'), 'rviz', 'default_config.rviz')],
         parameters=[{"use_sim_time": True}],
         condition=IfCondition(PythonExpression([use_rviz, ' and "', LaunchConfiguration('nb_drones'), '" == "0"']))
     )
@@ -198,7 +198,7 @@ def launch_setup(context):
         package='rviz2',
         executable='rviz2',
         output='screen',
-        arguments=['-d', os.path.join(get_package_share_directory('gazebo_sim'), 'rviz', 'summit_xl_1.rviz')],
+        arguments=['-d', os.path.join(get_package_share_directory('gazebo_sim'), 'rviz', 'default_config.rviz')],
         parameters=[{"use_sim_time": True}],
         condition=IfCondition(PythonExpression([use_rviz, ' and "', LaunchConfiguration('nb_drones'), '" != "0"']))
     )
