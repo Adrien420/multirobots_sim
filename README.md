@@ -253,7 +253,7 @@ Command (example) &nbsp;:
 ros2 launch gazebo_sim multirobots_simu.launch.py rviz:=True rosbag:=true nb_drones:=3
 ```
 
-- **Run follow path nodes &nbsp;:**
+- **Run teleop nodes &nbsp;:**
 
 Node arguments &nbsp;:
 
@@ -269,7 +269,7 @@ Command (example) &nbsp;:
 ros2 run gazebo_sim px4_teleop --ros-args -p drone_id:=2
 ```
 
-- **Run teleop nodes &nbsp;:**
+- **Run follow path nodes &nbsp;:**
 
 Node arguments &nbsp;:
 
