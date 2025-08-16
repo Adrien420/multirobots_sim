@@ -1,10 +1,10 @@
-This document is a list of everything I planned to implement/debug in this project, but didn't have enough time to do so.
+This document lists everything I planned to implement & debug in this project, but didn't have enough time to complete.
 
-- For the following_path nodes, publish the messages of type Path (created when loading the yaml file), to use & visualize them in Rviz
+- For the follow_path nodes, publish messages of type Path (created when loading the yaml file), to use & visualize them in Rviz
 
-- Change dynamically the config file .rviz (the one in install/gazebo_sim/share/gazebo_sim/rviz) in the launch file to adapt it to the robots simulated (currently : configured for one robot of each type)
+- Dynamically change the .rviz config file (the one in install/gazebo_sim/share/gazebo_sim/rviz) in the launch file to adapt it to the robots simulated (currently : configured for one robot of each type)
 => This would be done in a similar way as the config files for the summit controllers, and would be based on the current config file (what needs to change is the number of Displays, according to the number of robots, and the id used for these Displays)
-=> It would also require to change the tf_publisher node. It could be done by publishing only one tf according to the robot chosen, with the appropriate id. Then, this node would be launched in the launch file spawning the robot (for each type of robot), with the type of robot and the id as parameters
+=> It would also require to change the tf_publisher node. It could be done by publishing only one tf according to the chosen robot, with the appropriate id. Then, this node would be launched in the launch file spawning the robot (for each type of robot), with the type of robot and the id as parameters
 
 - Find a way with rosbags to publish at the same frequency (variable) as in the simulation 
 => I didn't find any option in the rosbag commands, or any packages to do that
@@ -13,12 +13,21 @@ This document is a list of everything I planned to implement/debug in this proje
 => The plugin gz-sim-wind-effects-system is needed for that, you can find an example of that in the wind.sdf file of the gz-sim github. The link for that repository is in useful_online_resources.txt
 
 - The RTF is still rather low, despite using the GPU. Howerve CPUs are not fully used, and GPU is barely used (3% at maximum) 
-=> Maybe there are still other limitations, coming from Gazebo or Docker. I didn't have time to fully explore that. I still chearched for a bit, but didn't find any useful information on that specifically.
+=> Maybe there are still other limitations, coming from Gazebo or Docker. I didn't have time to fully explore that. I still searched for a bit, but didn't find any specific useful information on this.
 
 - For the ranger mini, it is not fully implemented.
 => There are still issues with the load of the controllers, which is really inconsistent, and I could not find the exact reason why. 
 However, one thing I noticed is that the robot controllers take too much time to be loaded (successfully or not), and adding the camera controller made the success rate much worse.
 Because of that, the ptz camera (taken from the robotnik_sensors package), is not correctly implemented (I removed it for now).
 Furthermore, the ranger mini is not controlled in the same way as the summit, and suffers much more from the issues with Gazebo physics and the terrain with relief.
-Therefore, it is difficult to control the robot well with the teleop node, and the follow_path node is kind of unsuable.
+Therefore, it is difficult to control the robot well with the teleop node, and the follow_path node is kind of unusable.
 The physics may not be the only issue behind that (it could also be caused by parameters in the description files), but I didn't have time to check that in depth.
+
+- Integrate other drones (not included with PX4, such as a DJI NEO).
+My idea for this was to find the drone's description file in sdf format, if possible. 
+Then, it should be possible to add this drone to the PX4-Autopilot package and therefore use PX4 to control it.
+This can be done by first adding the sdf file to Tools/simulation/gz/models, in a folder containing a model.config as well (based on the x500).
+Afterwards, create an airframe file under ROMFS/px4fmu_common/init.d-posix (based on the 4001_gz_x500), named using a number (4229_my_vehicle for instance)
+Finally, add the airframe name (my_vehicle) to the file src/modules/simulation/simulator_mavlink/sitl_targets_gazebo-classic.cmake in the command set(models …
+
+Using a launch file similar to spawn_px4.launch.py one, it should be possible to spawn this drone.

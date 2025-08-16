@@ -1,10 +1,10 @@
-Just a quick guide about the use of submodules in Github. 
+A quick guide to using submodules in Github. 
 
 	I - How to create a submodule 
 	
 1 - Fork the github repository needed for the submodule (on your Github account)
 
-2 - At the root of your local repository, add the submodule with the following command : 
+2 - From the root of your local repository, add the submodule with the following command : 
 git submodule add -b <branch> <url_fork> <submodule_path> (ex : git submodule add -b main https://github.com/Adrien420/PX4-Autopilot.git multirobots_ws/src/PX4-Autopilot)
 
 3 - Commit the submodule : 
@@ -18,7 +18,7 @@ II - Specific cases
 1 - Repositories cloned on a tag (like Micro-XRCE-DDS-Agent) :
 
 In the submodule's folder (after creating it), make sure to be on the right tag (git status / git checkout <tag>)
-Since the tag is associated with a specific commit, he is unchangeable (can't commit & push on it)
+Since the tag is associated with a specific commit, it is unchangeable (can't commit & push on it)
 Therefore, switch to a new branch with "git switch -c <branch>", and push this branch on the remote with "git push -u <remote> <branch>"
 
 2 - Repository cloned already containing submodules (like PX4-Autopilot) :
@@ -27,13 +27,13 @@ In the submodule's folder (after creating it), use "git submodule update --init 
 
 	III - Delete a submodule
 	
-You can simply remove the submodule section in the .gitmodules file, and then use "git rm --cached <submodule_name>"
+You can simply remove the submodule section from the .gitmodules file, and then use "git rm --cached <submodule_name>"
 
-By the way, it is also in this file that tou can change the tag/branch used by the submodule
+By the way, this is also in this file that you can change the tag/branch used by the submodule
 
 	IV - Troubleshooting with the submodules used in this project
 
-Below are some fixes to the submodules used in this project I had to make. These informations should not be relevant anymore for this project, but I decided to include thme there just in case.
+Below are some fixes for the submodules used in this project I had to make. It should not be relevant anymore for this project, but I decided to include them there just in case.
 
 	PX4-Autopilot :
 
@@ -44,7 +44,7 @@ So I added it in the "set(models...)" part + after line 173 (in "if(gazebo-class
 
 Issue : Errors with the PX4 topics in ROS2 ("Change payload size of '220' bytes is larger than the history payload size of '207' bytes and cannot be resized")
 
-Solution : Switch on the main branch of the px4_msgs, so that the definition of the messages of both packages are identical
+Solution : Switch to the main branch of the px4_msgs, so that the message definitions for both packages are identical
 
 	Micro-XRCE-DDS-Agent : 
 	
