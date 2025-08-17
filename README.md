@@ -253,6 +253,20 @@ Command (example) &nbsp;:
 ros2 launch gazebo_sim multirobots_simu.launch.py rviz:=True rosbag:=true nb_drones:=3
 ```
 
+- **Play a rosbag &nbsp;:**
+
+Launch arguments &nbsp;:
+
+| Argument | Type | Default Value | Usage |
+| :---: | :---: | :---: | :---: |
+| `name` | str | '' | Name of the rosbag to play |
+
+Command (example) &nbsp;:
+
+```
+ros2 launch gazebo_sim play_rosbag.launch.py name:=some_rosbag_name
+```
+
 - **Run teleop nodes &nbsp;:**
 
 Node arguments &nbsp;:
